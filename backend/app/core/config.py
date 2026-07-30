@@ -24,6 +24,9 @@ class Settings(BaseSettings):
         "http://localhost:5173",
         "http://localhost:3000",
         "http://127.0.0.1:5173",
+        "https://ocular.eliaia.pro",
+        "https://pl.eliaia.pro",
+        "https://frontend-production-c802.up.railway.app",
     ]
 
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
