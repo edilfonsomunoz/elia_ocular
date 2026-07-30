@@ -151,3 +151,4 @@ eliaocular/
 
 - **Correo**: `admin@example.com`
 - **Contraseña**: `admin123456`
+
