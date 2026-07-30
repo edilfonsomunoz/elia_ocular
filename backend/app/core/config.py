@@ -27,6 +27,7 @@ class Settings(BaseSettings):
         "https://ocular.eliaia.pro",
         "https://pl.eliaia.pro",
         "https://frontend-production-c802.up.railway.app",
+        "https://backend-production-09f7.up.railway.app",
     ]
 
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
