@@ -51,14 +51,14 @@ def init_db():
             user = User(
                 email=admin_email,
                 full_name="Administrador de Prueba",
-                hashed_password=security.get_password_hash("admin123456"),
+                hashed_password=security.get_password_hash("123456"),
                 role=UserRole.ADMINISTRADOR.value,
                 is_active=True,
                 is_superuser=True
             )
             db.add(user)
             db.commit()
-            print(f"[OK] Usuario de prueba creado: {admin_email} / admin123456")
+            print(f"[OK] Usuario de prueba creado: {admin_email} / 123456")
         else:
             print(f"[INFO] Usuario de prueba {admin_email} ya existe.")
     finally:

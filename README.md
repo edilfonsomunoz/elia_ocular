@@ -150,5 +150,5 @@ eliaocular/
 ## 👤 Credenciales de Prueba por Defecto (Creadas por `init_db.py`)
 
 - **Correo**: `admin@example.com`
-- **Contraseña**: `admin123456`
+- **Contraseña**: `123456`
 
