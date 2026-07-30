@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { 
   ShieldCheck, 
   LogOut, 
@@ -11,11 +12,14 @@ import {
   LayoutDashboard,
   Eye,
   Activity,
+  Sun,
+  Moon,
   X
 } from 'lucide-react';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -101,6 +105,25 @@ const Navbar = () => {
                   </Link>
                 </div>
 
+                {/* Theme Switcher Button */}
+                <button
+                  onClick={toggleTheme}
+                  title={theme === 'dark' ? "Cambiar a Vista Claro" : "Cambiar a Vista Oscuro"}
+                  className="p-2 px-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] text-amber-400 hover:text-amber-300 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 text-xs font-medium"
+                >
+                  {theme === 'dark' ? (
+                    <>
+                      <Sun className="w-4 h-4 text-amber-400" />
+                      <span className="hidden sm:inline text-xs text-slate-300">Vista Claro</span>
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="w-4 h-4 text-indigo-400" />
+                      <span className="hidden sm:inline text-xs text-slate-700">Vista Oscuro</span>
+                    </>
+                  )}
+                </button>
+
                 {/* User Dropdown */}
                 <div className="relative" ref={dropdownRef}>
                   <button
@@ -136,6 +159,22 @@ const Navbar = () => {
 
                       {/* Menu Items */}
                       <div className="p-1.5">
+                        <button
+                          onClick={toggleTheme}
+                          className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/[0.06] transition-all text-xs font-medium cursor-pointer"
+                        >
+                          {theme === 'dark' ? (
+                            <>
+                              <Sun className="w-4 h-4 text-amber-400" />
+                              <span>Cambiar a Vista Claro</span>
+                            </>
+                          ) : (
+                            <>
+                              <Moon className="w-4 h-4 text-indigo-400" />
+                              <span>Cambiar a Vista Oscuro</span>
+                            </>
+                          )}
+                        </button>
                         <button
                           onClick={() => setDropdownOpen(false)}
                           className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/[0.06] transition-all text-xs font-medium cursor-pointer"
@@ -175,6 +214,25 @@ const Navbar = () => {
               </>
             ) : (
               <div className="flex items-center space-x-2">
+                {/* Theme Switcher for Guests */}
+                <button
+                  onClick={toggleTheme}
+                  title={theme === 'dark' ? "Cambiar a Vista Claro" : "Cambiar a Vista Oscuro"}
+                  className="p-2 px-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] text-amber-400 hover:text-amber-300 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 text-xs font-medium"
+                >
+                  {theme === 'dark' ? (
+                    <>
+                      <Sun className="w-4 h-4 text-amber-400" />
+                      <span className="hidden sm:inline text-xs text-slate-300">Vista Claro</span>
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="w-4 h-4 text-indigo-400" />
+                      <span className="hidden sm:inline text-xs text-slate-700">Vista Oscuro</span>
+                    </>
+                  )}
+                </button>
+
                 <Link
                   to="/login"
                   className="text-xs font-medium text-slate-300 hover:text-white px-4 py-2 rounded-lg hover:bg-white/[0.04] transition-all duration-200"
