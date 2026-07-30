@@ -1,0 +1,51 @@
+# Environment & Secrets
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+backend/.env
+
+# Node & Frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/vite.config.js.timestamp-*.mjs
+
+# Python & Backend
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+backend/__pycache__/
+backend/**/__pycache__/
+backend/.venv/
+backend/venv/
+backend/uploads/*
+!backend/uploads/.gitkeep
+backend/reports/*
+!backend/reports/.gitkeep
+
+# OS / Temporary / Zip files
+.DS_Store
+Thumbs.db
+*.zip
+nul
+.idea/
+.vscode/
