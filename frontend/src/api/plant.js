@@ -13,6 +13,7 @@ export const uploadDataset = (formData) => api.post('/plant/upload', formData, {
   headers: {
     'Content-Type': 'multipart/form-data',
   },
+  timeout: 0,
 }).then(r => r.data);
 
 export const listDatasets = () => api.get('/plant/datasets').then(r => r.data);

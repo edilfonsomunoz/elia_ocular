@@ -56,10 +56,11 @@ async def upload_dataset(
     zip_path = os.path.join(UPLOADS_DIR, f"user_{current_user.id}_{file.filename}")
 
     try:
-        content = await file.read()
-        with open(zip_path, "wb") as f:
-            f.write(content)
+        with open(zip_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
     except Exception as e:
+        if os.path.exists(zip_path):
+            os.remove(zip_path)
         raise HTTPException(status_code=500, detail=f"Error al guardar el archivo: {str(e)}")
 
     class_distribution = {}

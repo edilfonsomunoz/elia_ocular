@@ -73,6 +73,9 @@ const PlantUpload = () => {
         } else if (Array.isArray(err.response.data.detail)) {
           errorMessage = err.response.data.detail.map(e => e.msg || e.message || JSON.stringify(e)).join(', ');
         }
+      } else if (err.message === 'Network Error' || !err.response) {
+        errorMessage = `Error de Red al subir el archivo (${(file.size / 1024 / 1024).toFixed(2)} MB). ` +
+          `Verifica la conexión o asegúrate de que el servidor servidor/proxy (Nginx) tenga suficiente límite de tamaño (ej: client_max_body_size 500M;).`;
       } else if (err.message) {
         errorMessage = err.message;
       }
