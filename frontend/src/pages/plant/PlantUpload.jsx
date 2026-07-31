@@ -34,7 +34,7 @@ const PlantUpload = () => {
     e.preventDefault();
     setDragOver(false);
     const f = e.dataTransfer.files[0];
-    if (f && f.name.endsWith('.zip')) {
+    if (f && f.name.toLowerCase().endsWith('.zip')) {
       setFile(f);
       setError('');
     } else {
@@ -45,8 +45,12 @@ const PlantUpload = () => {
   const handleFileChange = (e) => {
     const f = e.target.files[0];
     if (f) {
-      setFile(f);
-      setError('');
+      if (f.name.toLowerCase().endsWith('.zip')) {
+        setFile(f);
+        setError('');
+      } else {
+        setError('Solo se permiten archivos ZIP');
+      }
     }
   };
 
@@ -62,7 +66,17 @@ const PlantUpload = () => {
       setFile(null);
       loadDatasets();
     } catch (err) {
-      setError(err.response?.data?.detail || 'Error al subir el archivo');
+      let errorMessage = 'Error al subir el archivo';
+      if (err.response?.data?.detail) {
+        if (typeof err.response.data.detail === 'string') {
+          errorMessage = err.response.data.detail;
+        } else if (Array.isArray(err.response.data.detail)) {
+          errorMessage = err.response.data.detail.map(e => e.msg || e.message || JSON.stringify(e)).join(', ');
+        }
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      setError(errorMessage);
     } finally {
       setUploading(false);
     }

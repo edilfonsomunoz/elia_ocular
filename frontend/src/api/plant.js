@@ -9,7 +9,11 @@ export const getPlantConfusionMatrix = () => api.get('/plant/confusion-matrix').
 export const getPlantClassificationReport = () => api.get('/plant/classification-report').then(r => r.data);
 export const getPlantPredictions = () => api.get('/plant/predictions').then(r => r.data);
 
-export const uploadDataset = (formData) => api.post('/plant/upload', formData).then(r => r.data);
+export const uploadDataset = (formData) => api.post('/plant/upload', formData, {
+  headers: {
+    'Content-Type': 'multipart/form-data',
+  },
+}).then(r => r.data);
 
 export const listDatasets = () => api.get('/plant/datasets').then(r => r.data);
 export const deleteDataset = (id) => api.delete(`/plant/datasets/${id}`).then(r => r.data);

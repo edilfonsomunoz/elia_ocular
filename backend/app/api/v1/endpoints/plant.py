@@ -49,15 +49,18 @@ async def upload_dataset(
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ):
-    if not file.filename.endswith('.zip'):
+    if not file.filename.lower().endswith('.zip'):
         raise HTTPException(status_code=400, detail="Solo se permiten archivos ZIP")
 
     os.makedirs(UPLOADS_DIR, exist_ok=True)
     zip_path = os.path.join(UPLOADS_DIR, f"user_{current_user.id}_{file.filename}")
 
-    content = await file.read()
-    with open(zip_path, "wb") as f:
-        f.write(content)
+    try:
+        content = await file.read()
+        with open(zip_path, "wb") as f:
+            f.write(content)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al guardar el archivo: {str(e)}")
 
     class_distribution = {}
     total_images = 0
@@ -69,10 +72,22 @@ async def upload_dataset(
             for info in z.infolist():
                 if info.is_dir():
                     continue
-                parts = info.filename.split('/')
+
+                # Normalize slashes (windows zip files might use backslashes \)
+                clean_name = info.filename.replace('\\', '/').strip('/')
+                
+                # Ignore hidden files, __MACOSX directory, system metadata
+                if clean_name.startswith('__MACOSX/') or '/.' in clean_name or os.path.basename(clean_name).startswith('.'):
+                    continue
+
+                parts = [p for p in clean_name.split('/') if p]
+                if not parts:
+                    continue
+
                 ext = os.path.splitext(parts[-1])[1].lower()
                 if ext not in IMAGE_EXTENSIONS:
                     continue
+
                 if len(parts) >= 2 and parts[-2]:
                     class_name = parts[-2]
                     class_distribution[class_name] = class_distribution.get(class_name, 0) + 1
@@ -89,9 +104,24 @@ async def upload_dataset(
 
         class_dirs = sorted(class_distribution.keys())
 
+        if total_images == 0:
+            if os.path.exists(zip_path):
+                os.remove(zip_path)
+            raise HTTPException(
+                status_code=400, 
+                detail="El archivo ZIP no contiene imágenes válidas (.jpg, .jpeg, .png, .bmp, .webp, .tiff, .gif)"
+            )
+
     except zipfile.BadZipFile:
-        os.remove(zip_path)
+        if os.path.exists(zip_path):
+            os.remove(zip_path)
         raise HTTPException(status_code=400, detail="El archivo ZIP está corrupto")
+    except HTTPException:
+        raise
+    except Exception as e:
+        if os.path.exists(zip_path):
+            os.remove(zip_path)
+        raise HTTPException(status_code=500, detail=f"Error al analizar el ZIP: {str(e)}")
 
     dataset = UploadedDataset(
         user_id=current_user.id,
