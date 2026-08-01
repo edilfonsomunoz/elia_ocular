@@ -14,6 +14,7 @@ const MedicalUpload = () => {
   const [diagnosing, setDiagnosing] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [diagnosisResult, setDiagnosisResult] = useState(null);
+  const [patientsError, setPatientsError] = useState('');
 
   useEffect(() => {
     loadPatients();
@@ -23,8 +24,13 @@ const MedicalUpload = () => {
     try {
       const data = await listPatients();
       setPatients(data);
+      setPatientsError('');
     } catch (error) {
-      console.error('Error loading patients:', error);
+      setPatientsError(
+        error.response?.status === 403
+          ? 'Tu rol no tiene permisos para ver pacientes. Usa una cuenta de administrador o médico.'
+          : error.response?.data?.detail || 'Error al cargar la lista de pacientes.'
+      );
     }
   };
 
@@ -144,6 +150,12 @@ const MedicalUpload = () => {
                 </option>
               ))}
             </select>
+            {patients.length === 0 && (
+              <p className="mt-2 text-[11px] text-amber-400/90 flex items-center gap-1.5">
+                <AlertCircle className="w-3.5 h-3.5" />
+                {patientsError || 'No hay pacientes registrados. Regístrelos como administrador o médico.'}
+              </p>
+            )}
           </div>
 
           <div>

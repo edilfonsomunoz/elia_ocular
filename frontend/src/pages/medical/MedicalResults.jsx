@@ -84,6 +84,7 @@ const MedicalResults = () => {
   const [expandedId, setExpandedId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('resultados'); // 'resultados' | 'analytics'
+  const [patientsError, setPatientsError] = useState('');
 
   useEffect(() => {
     loadData();
@@ -94,7 +95,14 @@ const MedicalResults = () => {
       setLoading(true);
       const [resultsData, patientsData] = await Promise.all([
         listResults(filterPatient || null),
-        listPatients().catch(() => [])
+        listPatients().catch((err) => {
+          setPatientsError(
+            err.response?.status === 403
+              ? 'Tu rol no tiene permisos para ver pacientes. Usa una cuenta de administrador o médico.'
+              : err.response?.data?.detail || ''
+          );
+          return [];
+        })
       ]);
       setResults(resultsData);
       setPatients(patientsData);
@@ -375,6 +383,12 @@ const MedicalResults = () => {
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
                 </div>
               </div>
+              {patients.length === 0 && (
+                <p className="text-[11px] text-amber-400/90 flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                  {patientsError || 'No hay pacientes registrados aún.'}
+                </p>
+              )}
 
               {/* Results List */}
               {filteredResults.length === 0 ? (
