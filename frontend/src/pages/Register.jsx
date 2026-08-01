@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { User, Mail, Lock, Eye, EyeOff, UserPlus, AlertCircle, CheckCircle2, ArrowRight, UserCheck, Shield } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, UserPlus, AlertCircle, CheckCircle2, ArrowRight, UserCheck, Shield, CreditCard, Calendar, Users } from 'lucide-react';
 
 const Register = () => {
   const [fullName, setFullName] = useState('');
@@ -9,6 +9,9 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [role, setRole] = useState('paciente');
+  const [documentNumber, setDocumentNumber] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [gender, setGender] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -38,7 +41,19 @@ const Register = () => {
     }
 
     setIsSubmitting(true);
-    const result = await register(fullName, email, password, role);
+    const result = await register(
+      fullName,
+      email,
+      password,
+      role,
+      role === 'paciente'
+        ? {
+            document_number: documentNumber,
+            date_of_birth: dateOfBirth,
+            gender: gender,
+          }
+        : {}
+    );
     setIsSubmitting(false);
 
     if (result.success) {
@@ -236,6 +251,72 @@ const Register = () => {
                 <p className="text-[11px] text-red-400 mt-1.5 animate-fadeIn">Las contraseñas no coinciden</p>
               )}
             </div>
+
+            {/* Patient-only fields */}
+            {role === 'paciente' && (
+              <div className="space-y-4 animate-slideUp" style={{ animationDelay: '0.22s' }}>
+                {/* Document Number */}
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-[0.15em] mb-2">
+                    Número de Documento *
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                      <CreditCard className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="text"
+                      value={documentNumber}
+                      onChange={(e) => setDocumentNumber(e.target.value)}
+                      required
+                      placeholder="Ej: 12345678"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl glass-input text-sm outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Date of Birth */}
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-[0.15em] mb-2">
+                    Fecha de Nacimiento *
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                      <Calendar className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="date"
+                      value={dateOfBirth}
+                      onChange={(e) => setDateOfBirth(e.target.value)}
+                      required
+                      className="w-full pl-10 pr-4 py-3 rounded-xl glass-input text-sm outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Gender */}
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-[0.15em] mb-2">
+                    Género *
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                      <Users className="w-4 h-4" />
+                    </div>
+                    <select
+                      value={gender}
+                      onChange={(e) => setGender(e.target.value)}
+                      required
+                      className="w-full pl-10 pr-4 py-3 rounded-xl glass-input text-sm outline-none appearance-none cursor-pointer"
+                    >
+                      <option value="" disabled className="text-slate-500">Seleccione su género</option>
+                      <option value="M" className="text-slate-900">Masculino</option>
+                      <option value="F" className="text-slate-900">Femenino</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Submit */}
             <div className="animate-slideUp" style={{ animationDelay: '0.25s' }}>

@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 
 from app.api import deps
 from app.core import security
-from app.models.user import User
+from app.models.user import User, UserRole
+from app.models.patient import Patient
 from app.schemas.token import Token
 from app.schemas.user import UserCreate, UserResponse, UserLogin
 
@@ -37,6 +38,27 @@ def register_user(
         is_superuser=False
     )
     db.add(db_user)
+    db.flush()
+
+    if user_in.role == UserRole.PACIENTE.value:
+        if not user_in.document_number or not user_in.date_of_birth or not user_in.gender:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Para registrar un paciente se requieren: numero de documento, fecha de nacimiento y genero.",
+            )
+        existing_document = db.query(Patient).filter(Patient.document_number == user_in.document_number).first()
+        if existing_document:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El numero de documento ya esta registrado.",
+            )
+        db.add(Patient(
+            user_id=db_user.id,
+            document_number=user_in.document_number,
+            date_of_birth=user_in.date_of_birth,
+            gender=user_in.gender,
+        ))
+
     db.commit()
     db.refresh(db_user)
     return db_user

@@ -48,13 +48,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (fullName, email, password, role = 'paciente') => {
+  const register = async (fullName, email, password, role = 'paciente', patientData = {}) => {
     try {
       await registerApi({
         full_name: fullName,
         email: email,
         password: password,
         role: role,
+        ...patientData,
       });
 
       // Luego del registro exitoso, iniciar sesión automáticamente

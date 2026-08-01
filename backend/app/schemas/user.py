@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from typing import Optional
 from pydantic import BaseModel, EmailStr, ConfigDict, Field
 
@@ -11,6 +11,9 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str = Field(..., min_length=6, max_length=100)
+    document_number: Optional[str] = Field(None, min_length=5, max_length=20)
+    date_of_birth: Optional[date] = None
+    gender: Optional[str] = None
 
 
 class UserLogin(BaseModel):
