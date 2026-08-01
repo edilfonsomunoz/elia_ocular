@@ -1,4 +1,5 @@
 import sys
+from datetime import date
 import pymysql
 from sqlalchemy import text
 from app.core.config import settings
@@ -61,8 +62,89 @@ def init_db():
             print(f"[OK] Usuario de prueba creado: {admin_email} / 123456")
         else:
             print(f"[INFO] Usuario de prueba {admin_email} ya existe.")
+
+        _seed_pacientes(db)
+        _seed_doctor(db)
     finally:
         db.close()
+
+
+def _seed_pacientes(db):
+    """Crea usuarios y perfiles de paciente de prueba si no existen."""
+    pacientes = [
+        {
+            "email": "paciente1@example.com",
+            "full_name": "Juan Pérez",
+            "document_number": "12345678",
+            "date_of_birth": date(1985, 5, 20),
+            "gender": "M",
+            "phone": "555-1000",
+        },
+        {
+            "email": "paciente2@example.com",
+            "full_name": "María López",
+            "document_number": "87654321",
+            "date_of_birth": date(1992, 11, 3),
+            "gender": "F",
+            "phone": "555-2000",
+        },
+    ]
+    for data in pacientes:
+        user = db.query(User).filter(User.email == data["email"]).first()
+        if not user:
+            user = User(
+                email=data["email"],
+                full_name=data["full_name"],
+                hashed_password=security.get_password_hash("123456"),
+                role=UserRole.PACIENTE.value,
+                is_active=True,
+                is_superuser=False,
+            )
+            db.add(user)
+            db.flush()
+            print(f"[OK] Usuario paciente creado: {data['email']} / 123456")
+        if not db.query(Patient).filter(Patient.user_id == user.id).first():
+            patient = Patient(
+                user_id=user.id,
+                document_number=data["document_number"],
+                date_of_birth=data["date_of_birth"],
+                gender=data["gender"],
+                phone=data["phone"],
+            )
+            db.add(patient)
+            db.flush()
+            print(f"[OK] Perfil de paciente creado: {data['full_name']} ({data['document_number']})")
+    db.commit()
+
+
+def _seed_doctor(db):
+    """Crea un usuario y perfil de doctor de prueba si no existen."""
+    doctor_email = "medico@example.com"
+    user = db.query(User).filter(User.email == doctor_email).first()
+    if not user:
+        user = User(
+            email=doctor_email,
+            full_name="Dr. Carlos Ruiz",
+            hashed_password=security.get_password_hash("123456"),
+            role=UserRole.MEDICO.value,
+            is_active=True,
+            is_superuser=False,
+        )
+        db.add(user)
+        db.flush()
+        print(f"[OK] Usuario medico creado: {doctor_email} / 123456")
+    if not db.query(Doctor).filter(Doctor.user_id == user.id).first():
+        doctor = Doctor(
+            user_id=user.id,
+            license_number="LIC-001",
+            specialty="Oftalmología",
+            hospital="Clínica EliaOcular",
+            years_experience=10,
+        )
+        db.add(doctor)
+        db.flush()
+        print(f"[OK] Perfil de doctor creado: Dr. Carlos Ruiz (LIC-001)")
+    db.commit()
 
 
 

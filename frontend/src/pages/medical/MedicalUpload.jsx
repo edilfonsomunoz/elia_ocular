@@ -84,16 +84,9 @@ const MedicalUpload = () => {
   };
 
   const imageTypes = [
-    { value: 'Catarata', label: 'Catarata', color: 'amber' },
-    { value: 'Glaucoma', label: 'Glaucoma', color: 'red' },
-    { value: 'Retinopatía diabética', label: 'Retinopatia Diabetica', color: 'purple' },
-    { value: 'Degeneración macular', label: 'Degeneracion Macular', color: 'blue' },
-    { value: 'Retina sana', label: 'Retina Sana', color: 'emerald' },
-    { value: 'retina', label: 'Retina (Otro)', color: 'slate' },
-    { value: 'fondo_de_ojo', label: 'Fondo de Ojo', color: 'slate' },
-    { value: 'oct', label: 'OCT', color: 'slate' },
-    { value: 'iris', label: 'Iris', color: 'slate' },
-    { value: 'conjuntiva', label: 'Conjuntiva', color: 'slate' },
+    { value: 'Catarata', label: 'Catarata' },
+    { value: 'Glaucoma', label: 'Glaucoma' },
+    { value: 'Miopía', label: 'Miopía' },
   ];
 
   const getLevelColor = (level) => {
@@ -162,16 +155,10 @@ const MedicalUpload = () => {
               onChange={(e) => setImageType(e.target.value)}
               className="w-full bg-slate-800 border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:border-cyan-500/50 focus:outline-none transition-colors"
             >
-              <optgroup label="Enfermedades Oculares" className="text-cyan-300 font-bold">
-                {imageTypes.filter(t => ['Catarata', 'Glaucoma', 'Retinopatía diabética', 'Degeneración macular', 'Retina sana'].includes(t.value)).map((type) => (
-                  <option key={type.value} value={type.value} className="bg-slate-800 text-white">{type.label}</option>
-                ))}
-              </optgroup>
-              <optgroup label="Tipo de Estudio" className="text-slate-300 font-bold">
-                {imageTypes.filter(t => !['Catarata', 'Glaucoma', 'Retinopatía diabética', 'Degeneración macular', 'Retina sana'].includes(t.value)).map((type) => (
-                  <option key={type.value} value={type.value} className="bg-slate-800 text-white">{type.label}</option>
-                ))}
-              </optgroup>
+              <option value="" className="bg-slate-800 text-white">Seleccione un tipo</option>
+              {imageTypes.map((type) => (
+                <option key={type.value} value={type.value} className="bg-slate-800 text-white">{type.label}</option>
+              ))}
             </select>
           </div>
 

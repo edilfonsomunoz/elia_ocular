@@ -20,7 +20,7 @@ CLASS_NAMES = [
     "Retina sana",
 ]
 
-IMAGE_TYPES = ["retina", "fondo_de_ojo", "oct", "iris", "conjuntiva", "Catarata", "Glaucoma", "Retinopatía diabética", "Degeneración macular", "Retina sana"]
+IMAGE_TYPES = ["Catarata", "Glaucoma", "Miopía"]
 
 os.makedirs(MODELS_DIR, exist_ok=True)
 os.makedirs(UPLOADS_DIR, exist_ok=True)
