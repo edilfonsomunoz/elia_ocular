@@ -1,0 +1,386 @@
+================================================================================
+                ELIAOCULAR - ARQUITECTURA DEL SISTEMA
+================================================================================
+
+Sistema de diagnóstico y análisis de enfermedades oculares con inteligencia
+artificial. Aplica tecnología de aprendizaje profundo (deep learning) para
+clasificar imágenes de la retina/fondo de ojo e identificar patologías como
+catarata, glaucoma, retinopatía diabética y degeneración macular.
+
+--------------------------------------------------------------------------------
+1. VISTA GENERAL (ARQUITECTURA DE ALTO NIVEL)
+--------------------------------------------------------------------------------
+
+                      +---------------------------+
+                      |        NAVEGADOR          |
+                      |  React 18 + Vite + Tailwind|
+                      +-------------+-------------+
+                                    |  HTTPS / HTTP
+                                    v
+                     +-------------+-------------+
+                     |   FRONTEND  (SPA - Vite)  |
+                     |  React Router, Axios,      |
+                     |  AuthContext, Recharts     |
+                     +-------------+-------------+
+                                    |  REST API (JSON) / JWT Bearer
+                                    v
+                     +-------------+-------------+
+                     |   BACKEND  (FastAPI)      |
+                     |  Router v1 (/api/v1)      |
+                     +------+----------+---------+
+                            |          |
+               +------------+          +-----------+
+               |                                  |
+               v                                  v
+     +---------+-----------+            +---------+---------+
+     |  MÓDULO AI (IA)     |            |  BASE DE DATOS    |
+     |  TensorFlow/Keras   |            |  MySQL 8           |
+     |  EfficientNet-B0     |            |  SQLAlchemy ORM    |
+     |  Entrenamiento/      |            +-------------------+
+     |  Inferencia/Reportes |
+     +---------------------+
+
+FLUJO PRINCIPAL:
+  1. El usuario se autentica (JWT) desde el frontend.
+  2. El frontend envía peticiones REST a FastAPI.
+  3. FastAPI valida permisos por rol, procesa la lógica y consulta MySQL.
+  4. Para diagnóstico, el backend invoca el módulo AI (TensorFlow) que
+     clasifica la imagen.
+  5. Los resultados se persisten y se devuelven al frontend.
+  6. Opcionalmente se genera un reporte PDF (ReportLab).
+
+--------------------------------------------------------------------------------
+2. ARQUITECTURA DEL BACKEND (FastAPI + SQLAlchemy 2 + MySQL)
+--------------------------------------------------------------------------------
+
+backend/
+├── app/
+│   ├── main.py                 # Entrada FastAPI, CORS, registra router v1
+│   ├── api/
+│   │   ├── deps.py             # Inyección de dependencias: get_db y
+│   │   │                       #   get_current_user (autenticación JWT)
+│   │   └── v1/
+│   │       ├── api.py          # Router principal que agrupa todos los routers
+│   │       └── endpoints/
+│   │           ├── auth.py     # POST /register, POST /login, GET /me
+│   │           ├── plant.py    # Módulo análisis de dataset (ZIP, entrenamiento
+│   │           │               #   simulado, distribución, matriz, predicciones)
+│   │           ├── patient.py  # CRUD de pacientes (rol admin/médico)
+│   │           ├── doctor.py   # CRUD de doctores (solo administrador)
+│   │           └── medical.py  # Upload de imagen, diagnóstico AI, historial,
+│   │                           #   resultados y estadísticas médicas
+│   ├── core/
+│   │   ├── config.py           # Configuración Pydantic Settings (.env)
+│   │   └── security.py         # Hash bcrypt y generación/validación JWT
+│   ├── db/
+│   │   ├── base.py             # DeclarativeBase de SQLAlchemy 2.0
+│   │   └── session.py          # Motor y fábrica de sesiones MySQL
+│   ├── models/                 # Modelos ORM (tablas de la BD)
+│   │   ├── user.py             #   users
+│   │   ├── patient.py          #   patients
+│   │   ├── doctor.py           #   doctors
+│   │   ├── medical_image.py    #   medical_images
+│   │   ├── diagnosis.py        #   diagnoses
+│   │   ├── clinical_history.py #   clinical_history
+│   │   ├── report.py           #   reports
+│   │   └── plant.py            #   plant_diseases, analysis_sessions,
+│   │                           #   uploaded_datasets
+│   ├── schemas/                # Esquemas Pydantic v2 (validación/serialización)
+│   │   ├── user.py, token.py, patient.py, doctor.py
+│   │   ├── medical_image.py, diagnosis.py, report.py, plant.py
+│   └── services/
+│       └── pdf_generation.py   # Generación de reportes PDF (ReportLab)
+├── ai/                         # MÓDULO DE INTELIGENCIA ARTIFICIAL
+│   ├── config.py               # Rutas, hiperparámetros, clases y tipos
+│   ├── model.py                # Construcción CNN tipo EfficientNet-B0
+│   ├── preprocessing.py        # OpenCV: ruido, contraste, resize, augmentación
+│   ├── training.py             # Dataset loader, entrenamiento, métricas
+│   └── inference.py            # Carga del modelo y predicción (inference_service)
+├── init_db.py                  # Crea la BD y tablas automáticamente
+├── requirements.txt            # Dependencias de Python
+├── Procfile                    # Despliegue (Railway/Procfile)
+├── start.bat                   # Arranque en Windows
+├── uploads/                    # Imágenes médicas subidas
+├── models/                     # Modelos entrenados (.keras) y resultados JSON
+├── reports/                    # Reportes PDF generados
+├── training_data/              # Datos de entrenamiento
+└── .env / .env.example         # Configuración de entorno
+
+--------------------------------------------------------------------------------
+2.1 ENDPOINTS DE LA API (prefijo global: /api/v1)
+--------------------------------------------------------------------------------
+
+AUTENTICACIÓN (/api/v1/auth)
+  POST /register    -> Registro de usuario (devuelve UserResponse)
+  POST /login       -> Login, devuelve Token JWT
+  GET  /me          -> Usuario autenticado actual
+
+PACIENTES (/api/v1/patients)
+  POST /                     -> Crear paciente (admin/médico)
+  GET  /                     -> Listar pacientes (admin/médico)
+  GET  /{id}                 -> Obtener paciente
+  PUT  /{id}                 -> Actualizar paciente
+  GET  /user/{user_id}       -> Paciente por user_id
+
+DOCTORES (/api/v1/doctors)
+  POST /                     -> Crear doctor (solo administrador)
+  GET  /                     -> Listar doctores
+  GET  /{id}                 -> Obtener doctor
+  PUT  /{id}                 -> Actualizar doctor (solo administrador)
+
+MÉDICO (/api/v1/medical)
+  POST /upload               -> Subir imagen médica (multipart)
+  GET  /images               -> Listar imágenes (filtro por rol)
+  POST /diagnose/{image_id}  -> Ejecutar diagnóstico AI sobre la imagen
+  GET  /diagnosis/{id}       -> Detalle de un diagnóstico
+  GET  /history/{patient_id} -> Historial de diagnóstico de un paciente
+  GET  /my-history           -> Historial del propio paciente
+  GET  /results              -> Listar resultados (filtro por rol)
+  GET  /stats                -> Estadísticas globales
+
+ANÁLISIS DE DATASET (/api/v1/plant)
+  POST /upload               -> Subir dataset en ZIP (con carpetas por clase)
+  GET  /overview             -> Resumen del dataset
+  GET  /distribution         -> Distribución de clases
+  GET  /classes              -> Lista de clases
+  GET  /training             -> Historial de entrenamiento (simulado)
+  GET  /evaluation           -> Métricas de evaluación (simuladas)
+  GET  /confusion-matrix     -> Matriz de confusión (simulada)
+  GET  /classification-report-> Reporte de clasificación (simulado)
+  GET  /predictions          -> Predicciones de ejemplo (simuladas)
+  GET  /datasets             -> Listar datasets subidos
+  DELETE /datasets/{id}      -> Eliminar dataset
+  GET  /sessions             -> Sesiones de análisis
+
+--------------------------------------------------------------------------------
+2.2 SEGURIDAD Y AUTENTICACIÓN
+--------------------------------------------------------------------------------
+  - Contraseñas: hash con Bcrypt (Passlib).
+  - Sesión: token JWT (HS256), firmado con SECRET_KEY.
+  - Expiración: ACCESS_TOKEN_EXPIRE_MINUTES (por defecto 1 día).
+  - Flujo: /auth/login -> devuelve access_token; el cliente lo envía como
+    header "Authorization: Bearer <token>".
+  - OAuth2PasswordBearer + get_current_user validan cada petición protegida.
+  - Roles: paciente, medico, administrador.
+    * paciente: solo ve/accede a sus propios datos.
+    * medico: gestiona pacientes, sube imágenes, diagnostica.
+    * administrador: gestiona doctores y todo lo anterior.
+
+--------------------------------------------------------------------------------
+2.3 BASE DE DATOS (MySQL) - TABLAS PRINCIPALES
+--------------------------------------------------------------------------------
+  users              (id, full_name, email unique, hashed_password, role,
+                      is_active, is_superuser, created_at, updated_at)
+  patients           (id, user_id FK, document_number unique, date_of_birth,
+                      gender, phone, address, medical_history, ...)
+  doctors            (id, user_id FK, license_number unique, specialty,
+                      hospital, years_experience, bio, ...)
+  medical_images     (id, patient_id FK, uploaded_by, filename, original_filename,
+                      image_type, file_size, description, created_at)
+  diagnoses          (id, image_id FK, patient_id FK, doctor_id FK, disease,
+                      probability, level, confidence, recommendations, notes,
+                      diagnosed_at, updated_at)
+  clinical_history   (id, patient_id FK, diagnosis_id FK, doctor_id FK, notes, ...)
+  reports            (id, ...)
+  plant_diseases     (id, name unique, plant, disease, description, created_at)
+  analysis_sessions  (id, user_id FK, session_name, total_images, num_classes,
+                      status, splits, image_size, metrics/history/matrix/report
+                      como JSON, created_at)
+  uploaded_datasets  (id, user_id FK, filename, total_rows, columns JSON,
+                      preview_data JSON, status, created_at)
+
+  Conexión: SQLAlchemy 2.0 + PyMySQL (mysql+pymysql://...). Pool con
+  pool_pre_ping=True y pool_recycle=3600.
+
+--------------------------------------------------------------------------------
+3. MÓDULO DE INTELIGENCIA ARTIFICIAL (backend/ai)
+--------------------------------------------------------------------------------
+
+  - Modelo: Red neuronal convolucional (CNN) estilo EfficientNet-B0 con
+    bloques de convoluciones depthwise-separable, BatchNorm, activación
+    "swish" y capa final Dense softmax.
+  - Entradas: imágenes RGB 224x224 normalizadas a [0,1].
+  - Clases de salida (NUM_CLASSES=5):
+      * Catarata
+      * Glaucoma
+      * Retinopatía diabética
+      * Degeneración macular
+      * Retina sana
+
+  preprocesamiento.py (OpenCV):
+      * remove_noise      -> Filtro Gaussiano
+      * enhance_contrast  -> CLAHE (ecualización de contraste adaptativo)
+      * resize_image      -> 224x224
+      * normalize_image   -> píxeles a [0,1]
+      * augment_image     -> rotación, volteo, brillo, zoom (data augmentation)
+      * validate_image    -> valida el archivo de imagen
+
+  training.py (TensorFlow):
+      * OcularDataset     -> carga imágenes de carpeta por clase
+      * OcularTrainer     -> compila el modelo, entrena con EarlyStopping,
+                             ModelCheckpoint, ReduceLROnPlateau y class weights;
+                             calcula matriz de confusión y reporte de clasificación
+                             (scikit-learn); guarda modelo .keras y resultados JSON.
+      * Nota: El endpoint /plant/training devuelve un entrenamiento SIMULADO
+        (valores sintéticos/aleatorios), no el entrenamiento real del módulo ai.
+
+  inference.py:
+      * OcularInference   -> carga el modelo y hace predicción por imagen.
+      * inference_service -> instancia global usada por /medical/diagnose.
+      * Si el modelo no está cargado o la predicción falla, se usa un
+        FALLBACK que genera un diagnóstico aleatorio (plantilla) para no romper
+        la API.
+
+--------------------------------------------------------------------------------
+4. ARQUITECTURA DEL FRONTEND (React 18 + Vite + Tailwind)
+--------------------------------------------------------------------------------
+
+frontend/
+├── index.html
+├── vite.config.js            # Proxy /api hacia el backend y config Vite
+├── tailwind.config.js
+├── postcss.config.js
+├── package.json
+└── src/
+    ├── main.jsx              # Punto de montaje de React
+    ├── App.jsx               # Router principal y rutas protegidas
+    ├── index.css             # Estilos Tailwind y animaciones
+    ├── api/
+    │   ├── axios.js          # Instancia Axios con interceptor de JWT
+    │   ├── auth.js           # Llamadas de autenticación
+    │   ├── medical.js        # Llamadas médicas (imágenes, diagnósticos...)
+    │   └── plant.js          # Llamadas del módulo de análisis de dataset
+    ├── context/
+    │   ├── AuthContext.jsx   # Estado global de autenticación (login/logout)
+    │   └── ThemeContext.jsx  # Estado global de tema (claro/oscuro)
+    ├── components/
+    │   ├── Navbar.jsx        # Barra de navegación superior
+    │   ├── ProtectedRoute.jsx# Guard de rutas protegidas
+    │   └── UserPanel.jsx     # Panel de usuario
+    └── pages/
+        ├── Login.jsx
+        ├── Register.jsx
+        ├── Dashboard.jsx
+        ├── plant/            # Módulo de análisis de dataset
+        │   ├── PlantLayout.jsx
+        │   ├── PlantOverview.jsx
+        │   ├── PlantUpload.jsx
+        │   ├── PlantDistribution.jsx
+        │   ├── PlantImages.jsx
+        │   ├── PlantTraining.jsx
+        │   ├── PlantEvaluation.jsx
+        │   ├── PlantConfusionMatrix.jsx
+        │   ├── PlantClassificationReport.jsx
+        │   └── PlantPredictions.jsx
+        └── medical/          # Módulo médico
+            ├── MedicalDashboard.jsx
+            ├── MedicalUpload.jsx
+            ├── MedicalResults.jsx
+            ├── MedicalDiagnosis.jsx
+            ├── MedicalHistory.jsx
+            ├── PatientList.jsx
+            └── DoctorList.jsx
+
+RUTAS DEL FRONTEND:
+  /login                      (público)
+  /register                   (público)
+  /dashboard                  (protegido)
+  /analisis-ocular/...        (protegido) módulo de análisis de dataset
+  /medical/...                (protegido) módulo médico
+  * -> redirige a /dashboard
+
+--------------------------------------------------------------------------------
+4.1 CLIENTE HTTP Y AUTENTICACIÓN EN FRONTEND
+--------------------------------------------------------------------------------
+  - axios.js crea una instancia con interceptor que inyecta el token
+    localStorage("token") en el header Authorization de cada petición.
+  - AuthContext gestiona login/registro/logout y expone el usuario actual.
+  - ProtectedRoute redirige a /login si no hay sesión activa.
+
+--------------------------------------------------------------------------------
+5. FLUJOS DE NEGOCIO CLAVE
+--------------------------------------------------------------------------------
+
+5.1 DIAGNÓSTICO MÉDICO
+  1. El médico sube la imagen (POST /medical/upload) y se guarda en uploads/.
+  2. POST /medical/diagnose/{image_id}:
+       - Verifica si ya existe diagnóstico (evita duplicados).
+       - Intenta usar inference_service (TensorFlow).
+       - Si falla, usa fallback aleatorio.
+       - Crea registro en diagnoses y en clinical_history.
+  3. GET /medical/results o /history/{patient_id} para consultar resultados.
+  4. GET /medical/stats para métricas globales.
+
+5.2 ANÁLISIS DE DATASET (MÓDULO PLANT/IA)
+  1. El usuario sube un ZIP con carpetas por clase (POST /plant/upload).
+  2. El backend valida el ZIP, cuenta imágenes por clase y lo persiste
+     como UploadedDataset (preview_data guarda el zip_path).
+  3. El resto de endpoints (/overview, /training, /evaluation, /matriz,
+     /reporte, /predicciones) devuelven datos SINTÉTICOS generados en tiempo
+     real a partir de la distribución de clases del dataset subido.
+
+--------------------------------------------------------------------------------
+6. GENERACIÓN DE REPORTES PDF
+--------------------------------------------------------------------------------
+  - services/pdf_generation.py usa ReportLab (platypus).
+  - Genera reporte A4 con: información del paciente, resultados del
+    diagnóstico, imagen médica, recomendaciones, información y firma del doctor.
+  - Se guarda en backend/reports/ y devuelve la ruta del archivo.
+
+--------------------------------------------------------------------------------
+7. TECNOLOGÍAS Y LIBRERÍAS
+--------------------------------------------------------------------------------
+
+BACKEND:
+  - FastAPI (asíncrono, alto rendimiento)
+  - SQLAlchemy 2.0 (ORM, sintaxis Mapped/mapped_column)
+  - PyMySQL (driver MySQL)
+  - Pydantic v2 + Pydantic-Settings (validación y configuración)
+  - PyJWT (tokens), Passlib/Bcrypt (hash de contraseñas)
+  - TensorFlow 2.15 + Keras (modelo CNN / deep learning)
+  - OpenCV (procesamiento de imágenes)
+  - scikit-learn (métricas, split, confusion matrix, class weights)
+  - NumPy, Pillow, matplotlib
+  - ReportLab (generación de PDF)
+  - python-multipart (subida de archivos)
+
+FRONTEND:
+  - React 18 + React DOM
+  - Vite 5 (build/dev server)
+  - Tailwind CSS 3 (UI glassmorphic/dark)
+  - React Router DOM v6 (routing y guards)
+  - Axios (HTTP con interceptores JWT)
+  - Recharts (gráficas)
+  - Lucide React (iconos)
+
+BASE DE DATOS:
+  - MySQL Server 8.0+
+
+--------------------------------------------------------------------------------
+8. DESPLIEGUE
+--------------------------------------------------------------------------------
+  - Local:
+      Backend:  uvicorn app.main:app --reload --port 8000
+      Frontend: npm run dev  (http://localhost:5173)
+  - Documentación de la API: http://localhost:8000/docs (Swagger)
+  - Producción: Procfile (Railway) + build de Vite a dist/.
+  - CORS configurado para dominios locales y de producción (ver config.py).
+  - Credenciales de prueba (creadas por init_db.py):
+      Correo:    admin@example.com
+      Contraseña: 123456
+
+--------------------------------------------------------------------------------
+9. RESUMEN DE FLUJOS ARQUITECTÓNICOS
+--------------------------------------------------------------------------------
+
+  Autenticación:  Frontend (AuthContext) -> POST /auth/login -> JWT -> interceptor
+                  Axios añade Bearer -> FastAPI valida con get_current_user.
+
+  Diagnóstico:    MedicalUpload -> guarda imagen -> diagnose_image -> IA o fallback
+                  -> diagnoses + clinical_history -> resultados en frontend.
+
+  Dataset/IA:     PlantUpload (ZIP) -> UploadedDataset -> vistas con métricas
+                  sintéticas para visualización del pipeline de IA.
+
+  Reportes:       Diagnosis -> pdf_generation (ReportLab) -> reports/*.pdf
+================================================================================
