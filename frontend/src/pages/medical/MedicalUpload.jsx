@@ -5,7 +5,7 @@ import { Upload, Image, AlertCircle, CheckCircle, Loader2, Activity, Stethoscope
 const MedicalUpload = () => {
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState('');
-  const [imageType, setImageType] = useState('Catarata');
+  const [imageType, setImageType] = useState('');
   const [description, setDescription] = useState('');
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -59,7 +59,7 @@ const MedicalUpload = () => {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('patient_id', selectedPatient);
-      formData.append('image_type', imageType);
+      formData.append('image_type', 'Catarata');
       formData.append('description', description);
 
       const uploadedImage = await uploadMedicalImage(formData);
@@ -69,6 +69,7 @@ const MedicalUpload = () => {
       try {
         const diagnosis = await diagnoseImage(uploadedImage.id);
         setDiagnosisResult(diagnosis);
+        setImageType(diagnosis.disease);
         setMessage({ type: 'success', text: 'Diagnostico completado exitosamente' });
       } catch (diagError) {
         setMessage({ type: 'warning', text: 'Imagen subida, pero el diagnostico fallo. El modelo de IA no esta disponible.' });
@@ -88,12 +89,6 @@ const MedicalUpload = () => {
     setMessage({ type: '', text: '' });
     setDescription('');
   };
-
-  const imageTypes = [
-    { value: 'Catarata', label: 'Catarata' },
-    { value: 'Glaucoma', label: 'Glaucoma' },
-    { value: 'Miopía', label: 'Miopía' },
-  ];
 
   const getLevelColor = (level) => {
     if (level === 'Alto') return 'text-red-400 bg-red-500/10 border-red-500/20';
@@ -162,16 +157,9 @@ const MedicalUpload = () => {
             <label className="block text-[11px] text-slate-500 uppercase tracking-wider font-semibold mb-2">
               Tipo de Imagen / Enfermedad *
             </label>
-            <select
-              value={imageType}
-              onChange={(e) => setImageType(e.target.value)}
-              className="w-full bg-slate-800 border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:border-cyan-500/50 focus:outline-none transition-colors"
-            >
-              <option value="" className="bg-slate-800 text-white">Seleccione un tipo</option>
-              {imageTypes.map((type) => (
-                <option key={type.value} value={type.value} className="bg-slate-800 text-white">{type.label}</option>
-              ))}
-            </select>
+            <div className="w-full bg-slate-800 border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white">
+              {imageType || 'Se detectara automaticamente al diagnosticar'}
+            </div>
           </div>
 
           <div>
@@ -264,7 +252,7 @@ const MedicalUpload = () => {
                   </div>
                   <div className="p-2 rounded-lg bg-white/[0.03]">
                     <span className="text-slate-500 block">Clase</span>
-                    <span className="text-cyan-400 font-medium">{imageType}</span>
+                    <span className="text-cyan-400 font-medium">{imageType || 'Por diagnosticar'}</span>
                   </div>
                 </div>
               </div>

@@ -263,6 +263,10 @@ def diagnose_image(
         db.add(clinical_entry)
         db.commit()
         db.refresh(diagnosis)
+        
+        medical_image.image_type = prediction['disease']
+        db.add(medical_image)
+        db.commit()
     except Exception as e:
         traceback.print_exc()
         db.rollback()
