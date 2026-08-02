@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { listPatients, getPatientHistory } from '../../api/medical';
-import { Users, Plus, History, Search } from 'lucide-react';
+import { listPatients, getPatientHistory, deletePatient } from '../../api/medical';
+import { Users, Plus, History, Search, Trash2, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 
 const PatientList = () => {
   const navigate = useNavigate();
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
 
   useEffect(() => {
     loadPatients();
@@ -21,6 +24,23 @@ const PatientList = () => {
       console.error('Error loading patients:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!confirmDelete) return;
+    setDeleting(true);
+    setMessage({ type: '', text: '' });
+    try {
+      await deletePatient(confirmDelete.id);
+      await loadPatients();
+      setConfirmDelete(null);
+      setMessage({ type: 'success', text: 'Paciente eliminado correctamente' });
+    } catch (error) {
+      setConfirmDelete(null);
+      setMessage({ type: 'error', text: error.response?.data?.detail || 'Error al eliminar el paciente' });
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -52,6 +72,16 @@ const PatientList = () => {
           <span>Nuevo Paciente</span>
         </button>
       </div>
+
+      {message.text && (
+        <div className={`p-3.5 rounded-xl text-xs flex items-center gap-3 ${
+          message.type === 'error' ? 'bg-red-500/[0.08] border border-red-500/20 text-red-300' :
+          'bg-emerald-500/[0.08] border border-emerald-500/20 text-emerald-300'
+        }`}>
+          {message.type === 'error' ? <AlertCircle className="w-4 h-4 flex-shrink-0" /> : <CheckCircle className="w-4 h-4 flex-shrink-0" />}
+          <span>{message.text}</span>
+        </div>
+      )}
 
       <div className="glass-card p-4">
         <div className="relative">
@@ -115,6 +145,13 @@ const PatientList = () => {
                 <Plus className="w-4 h-4" />
                 <span className="text-sm">Diagnóstico</span>
               </button>
+              <button
+                onClick={() => setConfirmDelete(patient)}
+                title="Eliminar"
+                className="p-2 bg-red-500/15 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
             </div>
           </div>
         ))}
@@ -129,6 +166,27 @@ const PatientList = () => {
           <p className="text-slate-400">
             {searchTerm ? 'Intente con otros términos de búsqueda' : 'Registre su primer paciente para comenzar'}
           </p>
+        </div>
+      )}
+
+      {confirmDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-sm glass-card rounded-xl border border-white/[0.08] p-6 space-y-4 animate-scaleIn text-center">
+            <div className="w-14 h-14 mx-auto rounded-xl bg-red-500/15 flex items-center justify-center">
+              <Trash2 className="w-7 h-7 text-red-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white">Eliminar Paciente</h2>
+              <p className="text-sm text-slate-400 mt-1">¿Estás seguro de eliminar a <strong className="text-white">{confirmDelete.full_name}</strong>? Se eliminará su historial y resultados. Esta acción no se puede deshacer.</p>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={handleDelete} disabled={deleting} className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50">
+                {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                <span>Eliminar</span>
+              </button>
+              <button onClick={() => setConfirmDelete(null)} className="flex-1 py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.08] text-slate-400 text-sm font-semibold transition-colors">Cancelar</button>
+            </div>
+          </div>
         </div>
       )}
     </div>

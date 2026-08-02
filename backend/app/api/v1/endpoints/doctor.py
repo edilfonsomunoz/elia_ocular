@@ -5,6 +5,9 @@ from sqlalchemy.orm import Session
 from app.api import deps
 from app.models.user import User, UserRole
 from app.models.doctor import Doctor
+from app.models.diagnosis import Diagnosis
+from app.models.clinical_history import ClinicalHistory
+from app.models.report import Report
 from app.schemas.doctor import DoctorCreate, DoctorUpdate, DoctorResponse, DoctorWithUser
 
 router = APIRouter()
@@ -142,3 +145,36 @@ def update_doctor(
     db.commit()
     db.refresh(doctor)
     return doctor
+
+
+@router.delete("/{doctor_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_doctor(
+    *,
+    db: Session = Depends(deps.get_db),
+    doctor_id: int,
+    current_user: User = Depends(deps.get_current_user),
+) -> None:
+    """
+    Eliminar un doctor. Solo administradores pueden eliminar doctores.
+    """
+    if current_user.role != UserRole.ADMINISTRADOR.value:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tiene permisos para eliminar doctores."
+        )
+
+    doctor = db.query(Doctor).filter(Doctor.id == doctor_id).first()
+    if not doctor:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Doctor no encontrado."
+        )
+
+    db.query(Diagnosis).filter(Diagnosis.doctor_id == doctor_id).update({Diagnosis.doctor_id: None})
+    db.query(ClinicalHistory).filter(ClinicalHistory.doctor_id == doctor_id).update({ClinicalHistory.doctor_id: None})
+    reports = db.query(Report).filter(Report.doctor_id == doctor_id).all()
+    for report in reports:
+        db.delete(report)
+
+    db.delete(doctor)
+    db.commit()

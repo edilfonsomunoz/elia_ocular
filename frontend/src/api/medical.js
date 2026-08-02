@@ -73,6 +73,11 @@ export const getPatientByUserId = async (userId) => {
   return response.data;
 };
 
+export const deletePatient = async (patientId) => {
+  const response = await axiosInstance.delete(`/patients/${patientId}`);
+  return response.data;
+};
+
 export const createDoctor = async (doctorData) => {
   const response = await axiosInstance.post('/doctors/', doctorData);
   return response.data;
@@ -90,5 +95,10 @@ export const getDoctor = async (doctorId) => {
 
 export const updateDoctor = async (doctorId, doctorData) => {
   const response = await axiosInstance.put(`/doctors/${doctorId}`, doctorData);
+  return response.data;
+};
+
+export const deleteDoctor = async (doctorId) => {
+  const response = await axiosInstance.delete(`/doctors/${doctorId}`);
   return response.data;
 };

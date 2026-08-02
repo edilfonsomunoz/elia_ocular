@@ -5,6 +5,10 @@ from sqlalchemy.orm import Session
 from app.api import deps
 from app.models.user import User, UserRole
 from app.models.patient import Patient
+from app.models.medical_image import MedicalImage
+from app.models.diagnosis import Diagnosis
+from app.models.clinical_history import ClinicalHistory
+from app.models.report import Report
 from app.schemas.patient import PatientCreate, PatientUpdate, PatientResponse, PatientWithUser
 
 router = APIRouter()
@@ -156,6 +160,40 @@ def update_patient(
     db.commit()
     db.refresh(patient)
     return patient
+
+
+@router.delete("/{patient_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_patient(
+    *,
+    db: Session = Depends(deps.get_db),
+    patient_id: int,
+    current_user: User = Depends(deps.get_current_user),
+) -> None:
+    """
+    Eliminar un paciente. Solo administradores y medicos pueden eliminar pacientes.
+    """
+    if current_user.role not in [UserRole.ADMINISTRADOR.value, UserRole.MEDICO.value]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tiene permisos para eliminar pacientes."
+        )
+
+    patient = db.query(Patient).filter(Patient.id == patient_id).first()
+    if not patient:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Paciente no encontrado."
+        )
+
+    db.query(Report).filter(Report.patient_id == patient_id).delete()
+    db.query(ClinicalHistory).filter(ClinicalHistory.patient_id == patient_id).delete()
+    db.query(Diagnosis).filter(Diagnosis.patient_id == patient_id).delete()
+    images = db.query(MedicalImage).filter(MedicalImage.patient_id == patient_id).all()
+    for image in images:
+        db.delete(image)
+
+    db.delete(patient)
+    db.commit()
 
 
 @router.get("/user/{user_id}", response_model=PatientResponse)
