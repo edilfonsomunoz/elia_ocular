@@ -65,7 +65,7 @@ const PatientList = () => {
           <p className="text-slate-400">{patients.length} pacientes registrados</p>
         </div>
         <button
-          onClick={() => navigate('/register')}
+          onClick={() => navigate('/medical/patients/new')}
           className="btn-primary px-4 py-2 rounded-lg flex items-center space-x-2"
         >
           <Plus className="w-5 h-5" />
@@ -127,6 +127,10 @@ const PatientList = () => {
                 <span className="text-white">
                   {new Date(patient.created_at).toLocaleDateString()}
                 </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Doctor</span>
+                <span className="text-cyan-400">{patient.doctor_name || 'Sin asignar'}</span>
               </div>
             </div>
 

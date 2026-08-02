@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.api import deps
 from app.models.user import User, UserRole
 from app.models.patient import Patient
+from app.models.doctor import Doctor
 from app.models.medical_image import MedicalImage
 from app.models.diagnosis import Diagnosis
 from app.models.clinical_history import ClinicalHistory
@@ -72,9 +73,15 @@ def list_patients(
     result = []
     for patient in patients:
         user = db.query(User).filter(User.id == patient.user_id).first()
+        doctor_name = ""
+        if patient.doctor_id:
+            doctor = db.query(Doctor).filter(Doctor.id == patient.doctor_id).first()
+            doctor_user = db.query(User).filter(User.id == doctor.user_id).first() if doctor else None
+            doctor_name = doctor_user.full_name if doctor_user else ""
         result.append(PatientWithUser(
             id=patient.id,
             user_id=patient.user_id,
+            doctor_id=patient.doctor_id,
             document_number=patient.document_number,
             date_of_birth=patient.date_of_birth,
             gender=patient.gender,
@@ -84,7 +91,8 @@ def list_patients(
             created_at=patient.created_at,
             updated_at=patient.updated_at,
             full_name=user.full_name if user else "",
-            email=user.email if user else ""
+            email=user.email if user else "",
+            doctor_name=doctor_name,
         ))
     return result
 
@@ -113,9 +121,15 @@ def get_patient(
         )
     
     user = db.query(User).filter(User.id == patient.user_id).first()
+    doctor_name = ""
+    if patient.doctor_id:
+        doctor = db.query(Doctor).filter(Doctor.id == patient.doctor_id).first()
+        doctor_user = db.query(User).filter(User.id == doctor.user_id).first() if doctor else None
+        doctor_name = doctor_user.full_name if doctor_user else ""
     return PatientWithUser(
         id=patient.id,
         user_id=patient.user_id,
+        doctor_id=patient.doctor_id,
         document_number=patient.document_number,
         date_of_birth=patient.date_of_birth,
         gender=patient.gender,
@@ -125,7 +139,8 @@ def get_patient(
         created_at=patient.created_at,
         updated_at=patient.updated_at,
         full_name=user.full_name if user else "",
-        email=user.email if user else ""
+        email=user.email if user else "",
+        doctor_name=doctor_name,
     )
 
 

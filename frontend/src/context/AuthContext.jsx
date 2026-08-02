@@ -48,13 +48,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (fullName, email, password, role = 'paciente', patientData = {}) => {
+  const register = async (fullName, email, password, role = 'paciente', patientData = {}, doctorId = null) => {
     try {
       await registerApi({
         full_name: fullName,
         email: email,
         password: password,
         role: role,
+        doctor_id: doctorId,
         ...patientData,
       });
 

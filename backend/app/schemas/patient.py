@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field, ConfigDict
 
 
 class PatientBase(BaseModel):
+    doctor_id: Optional[int] = None
     document_number: str = Field(..., min_length=5, max_length=20)
     date_of_birth: date
     gender: str
@@ -17,6 +18,7 @@ class PatientCreate(PatientBase):
 
 
 class PatientUpdate(BaseModel):
+    doctor_id: Optional[int] = None
     document_number: Optional[str] = Field(None, min_length=5, max_length=20)
     date_of_birth: Optional[date] = None
     gender: Optional[str] = None
@@ -37,3 +39,4 @@ class PatientResponse(PatientBase):
 class PatientWithUser(PatientResponse):
     full_name: str
     email: str
+    doctor_name: Optional[str] = None

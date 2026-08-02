@@ -16,6 +16,23 @@ from app.models.plant import PlantDisease, AnalysisSession, UploadedDataset
 from app.core import security
 
 
+def _add_missing_columns(db_engine):
+    """Agrega columnas nuevas a tablas existentes de forma idempotente."""
+    try:
+        with db_engine.connect() as conn:
+            check = conn.execute(
+                text("SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'patients' AND COLUMN_NAME = 'doctor_id'")
+            ).scalar()
+            if not check:
+                conn.execute(text("ALTER TABLE patients ADD COLUMN doctor_id BIGINT NULL, ADD CONSTRAINT fk_patients_doctor_id FOREIGN KEY (doctor_id) REFERENCES doctors(id)"))
+                conn.commit()
+                print("[OK] Columna 'doctor_id' agregada a la tabla patients.")
+            else:
+                print("[INFO] Columna 'doctor_id' ya existe en la tabla patients.")
+    except Exception as e:
+        print(f"[ERROR] No se pudo agregar la columna doctor_id: {e}")
+
+
 def create_database_if_not_exists():
     """Crea la base de datos MySQL en el servidor si no existe aún."""
     print(f"Verificando base de datos MySQL '{settings.MYSQL_DB}' en {settings.MYSQL_HOST}:{settings.MYSQL_PORT}...")
@@ -43,6 +60,8 @@ def init_db():
     print("Creando tablas en la base de datos...")
     Base.metadata.create_all(bind=engine)
     print("[OK] Tablas creadas correctamente.")
+
+    _add_missing_columns(db_engine=engine)
 
     db = SessionLocal()
     try:

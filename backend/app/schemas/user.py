@@ -14,6 +14,7 @@ class UserCreate(UserBase):
     document_number: Optional[str] = Field(None, min_length=5, max_length=20)
     date_of_birth: Optional[date] = None
     gender: Optional[str] = None
+    doctor_id: Optional[int] = None
 
 
 class UserLogin(BaseModel):

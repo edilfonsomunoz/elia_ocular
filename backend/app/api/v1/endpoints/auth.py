@@ -6,6 +6,7 @@ from app.api import deps
 from app.core import security
 from app.models.user import User, UserRole
 from app.models.patient import Patient
+from app.models.doctor import Doctor
 from app.schemas.token import Token
 from app.schemas.user import UserCreate, UserResponse, UserLogin
 
@@ -52,8 +53,18 @@ def register_user(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="El numero de documento ya esta registrado.",
             )
+        doctor_id = None
+        if user_in.doctor_id is not None:
+            doctor = db.query(Doctor).filter(Doctor.id == user_in.doctor_id).first()
+            if not doctor:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="El doctor seleccionado no existe.",
+                )
+            doctor_id = doctor.id
         db.add(Patient(
             user_id=db_user.id,
+            doctor_id=doctor_id,
             document_number=user_in.document_number,
             date_of_birth=user_in.date_of_birth,
             gender=user_in.gender,

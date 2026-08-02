@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { User, Mail, Lock, Eye, EyeOff, UserPlus, AlertCircle, CheckCircle2, ArrowRight, UserCheck, Shield, CreditCard, Calendar, Users } from 'lucide-react';
+import { listDoctors } from '../api/medical';
+import { User, Mail, Lock, Eye, EyeOff, UserPlus, AlertCircle, CheckCircle2, ArrowRight, UserCheck, Shield, CreditCard, Calendar, Users, Stethoscope } from 'lucide-react';
 
 const Register = () => {
   const [fullName, setFullName] = useState('');
@@ -12,6 +13,8 @@ const Register = () => {
   const [documentNumber, setDocumentNumber] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [gender, setGender] = useState('');
+  const [doctorId, setDoctorId] = useState('');
+  const [doctors, setDoctors] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -19,6 +22,18 @@ const Register = () => {
 
   const { register } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const loadDoctors = async () => {
+      try {
+        const data = await listDoctors();
+        setDoctors(data);
+      } catch (e) {
+        console.error('Error al cargar doctores:', e);
+      }
+    };
+    loadDoctors();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -52,7 +67,8 @@ const Register = () => {
             date_of_birth: dateOfBirth,
             gender: gender,
           }
-        : {}
+        : {},
+      role === 'paciente' && doctorId ? Number(doctorId) : null
     );
     setIsSubmitting(false);
 
@@ -312,6 +328,31 @@ const Register = () => {
                       <option value="" disabled className="text-slate-500">Seleccione su género</option>
                       <option value="M" className="text-slate-900">Masculino</option>
                       <option value="F" className="text-slate-900">Femenino</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Assigned Doctor */}
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-[0.15em] mb-2">
+                    Doctor que lo atenderá *
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                      <Stethoscope className="w-4 h-4" />
+                    </div>
+                    <select
+                      value={doctorId}
+                      onChange={(e) => setDoctorId(e.target.value)}
+                      required
+                      className="w-full pl-10 pr-4 py-3 rounded-xl glass-input text-sm outline-none appearance-none cursor-pointer"
+                    >
+                      <option value="" disabled className="text-slate-500">Seleccione un doctor</option>
+                      {doctors.map((doc) => (
+                        <option key={doc.id} value={doc.id} className="text-slate-900">
+                          {doc.full_name} - {doc.specialty}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
