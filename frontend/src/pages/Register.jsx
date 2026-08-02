@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { listPublicDoctors } from '../api/medical';
 import { User, Mail, Lock, Eye, EyeOff, UserPlus, AlertCircle, CheckCircle2, ArrowRight, UserCheck, Shield, CreditCard, Calendar, Users, Stethoscope } from 'lucide-react';
+import portada from '../login/portada.png';
 
 const Register = () => {
   const [fullName, setFullName] = useState('');
@@ -100,61 +101,72 @@ const Register = () => {
   const strength = passwordStrength(password);
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="mesh-gradient" />
-      <div className="noise-overlay" />
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-cyan-50">
+      {/* Decorative Elements */}
+      <div className="absolute top-20 right-10 w-72 h-72 bg-cyan-200/40 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-200/40 rounded-full blur-[100px] pointer-events-none" />
 
-      <div className="absolute top-20 right-10 w-72 h-72 bg-indigo-500/5 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-20 left-10 w-96 h-96 bg-brand-500/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="w-full h-full grid grid-cols-1 lg:grid-cols-2 relative z-10">
 
-      <div className="w-full max-w-[420px] relative z-10 animate-scaleIn">
-        
+        {/* Left: Cover Image full-width to the left edge */}
+        <div className="hidden lg:flex relative overflow-hidden">
+          <img
+            src={portada}
+            alt="Portada EliaOcular"
+            className="w-full h-full object-cover object-left"
+          />
+        </div>
+
+        {/* Right: Form */}
+        <div className="w-full flex items-center justify-center min-h-[calc(100vh-4rem)] py-10 overflow-y-auto">
+          <div className="w-full max-w-[420px] animate-scaleIn">
+
         {/* Logo Header */}
         <div className="text-center mb-8">
           <div className="relative w-16 h-16 mx-auto mb-5">
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-500 to-brand-500 opacity-20 blur-xl" />
-            <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-brand-500 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 opacity-20 blur-xl" />
+            <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
               <UserCheck className="w-8 h-8 text-white" />
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Crear una Cuenta</h1>
-          <p className="text-sm text-slate-400 mt-1.5">
+          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Crear una Cuenta</h1>
+          <p className="text-sm text-slate-500 mt-1.5">
             Completa tus datos para registrarte en el sistema
           </p>
         </div>
 
         {/* Card */}
-        <div className="glass-card rounded-2xl p-8">
-          
+        <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-xl shadow-slate-200/60">
+
           {error && (
-            <div className="mb-5 p-3.5 rounded-xl bg-red-500/[0.08] border border-red-500/20 text-red-300 text-xs flex items-start space-x-3 animate-fadeIn">
-              <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+            <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs flex items-start space-x-3 animate-fadeIn">
+              <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
               <span className="flex-1 font-medium leading-relaxed">{error}</span>
             </div>
           )}
 
           {success && (
-            <div className="mb-5 p-3.5 rounded-xl bg-emerald-500/[0.08] border border-emerald-500/20 text-emerald-300 text-xs flex items-center space-x-3 animate-fadeIn">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+            <div className="mb-5 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 text-xs flex items-center space-x-3 animate-fadeIn">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
               <span className="flex-1 font-medium">{success}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            
+
             {/* Role Selection */}
             <div className="animate-slideUp" style={{ animationDelay: '0s' }}>
-              <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-[0.15em] mb-2">
+              <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-[0.15em] mb-2">
                 Tipo de Usuario
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                   <Shield className="w-4 h-4" />
                 </div>
                 <select
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl glass-input text-sm outline-none appearance-none cursor-pointer"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm outline-none appearance-none cursor-pointer focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all shadow-sm"
                 >
                   <option value="paciente">Paciente</option>
                   <option value="medico">Médico</option>
@@ -164,11 +176,11 @@ const Register = () => {
 
             {/* Full Name */}
             <div className="animate-slideUp" style={{ animationDelay: '0.05s' }}>
-              <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-[0.15em] mb-2">
+              <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-[0.15em] mb-2">
                 Nombre Completo
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                   <User className="w-4 h-4" />
                 </div>
                 <input
@@ -177,18 +189,18 @@ const Register = () => {
                   onChange={(e) => setFullName(e.target.value)}
                   required
                   placeholder="Juan Pérez"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl glass-input text-sm outline-none"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all placeholder:text-slate-400 shadow-sm"
                 />
               </div>
             </div>
 
             {/* Email */}
             <div className="animate-slideUp" style={{ animationDelay: '0.1s' }}>
-              <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-[0.15em] mb-2">
+              <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-[0.15em] mb-2">
                 Correo Electrónico
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                   <Mail className="w-4 h-4" />
                 </div>
                 <input
@@ -197,18 +209,18 @@ const Register = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="juan@ejemplo.com"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl glass-input text-sm outline-none"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all placeholder:text-slate-400 shadow-sm"
                 />
               </div>
             </div>
 
             {/* Password */}
             <div className="animate-slideUp" style={{ animationDelay: '0.15s' }}>
-              <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-[0.15em] mb-2">
+              <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-[0.15em] mb-2">
                 Contraseña
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                   <Lock className="w-4 h-4" />
                 </div>
                 <input
@@ -217,12 +229,12 @@ const Register = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="Mínimo 6 caracteres"
-                  className="w-full pl-10 pr-11 py-3 rounded-xl glass-input text-sm outline-none"
+                  className="w-full pl-10 pr-11 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all placeholder:text-slate-400 shadow-sm"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -235,7 +247,7 @@ const Register = () => {
                       <div
                         key={i}
                         className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
-                          i <= strength.level ? strength.color : 'bg-slate-800'
+                          i <= strength.level ? strength.color : 'bg-slate-200'
                         }`}
                       />
                     ))}
@@ -247,11 +259,11 @@ const Register = () => {
 
             {/* Confirm Password */}
             <div className="animate-slideUp" style={{ animationDelay: '0.2s' }}>
-              <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-[0.15em] mb-2">
+              <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-[0.15em] mb-2">
                 Confirmar Contraseña
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                   <Lock className="w-4 h-4" />
                 </div>
                 <input
@@ -260,11 +272,11 @@ const Register = () => {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   placeholder="Repite tu contraseña"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl glass-input text-sm outline-none"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all placeholder:text-slate-400 shadow-sm"
                 />
               </div>
               {confirmPassword && password !== confirmPassword && (
-                <p className="text-[11px] text-red-400 mt-1.5 animate-fadeIn">Las contraseñas no coinciden</p>
+                <p className="text-[11px] text-red-500 mt-1.5 animate-fadeIn">Las contraseñas no coinciden</p>
               )}
             </div>
 
@@ -273,11 +285,11 @@ const Register = () => {
               <div className="space-y-4 animate-slideUp" style={{ animationDelay: '0.22s' }}>
                 {/* Document Number */}
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-[0.15em] mb-2">
+                  <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-[0.15em] mb-2">
                     Número de Documento *
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                       <CreditCard className="w-4 h-4" />
                     </div>
                     <input
@@ -286,18 +298,18 @@ const Register = () => {
                       onChange={(e) => setDocumentNumber(e.target.value)}
                       required
                       placeholder="Ej: 12345678"
-                      className="w-full pl-10 pr-4 py-3 rounded-xl glass-input text-sm outline-none"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all placeholder:text-slate-400 shadow-sm"
                     />
                   </div>
                 </div>
 
                 {/* Date of Birth */}
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-[0.15em] mb-2">
+                  <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-[0.15em] mb-2">
                     Fecha de Nacimiento *
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                       <Calendar className="w-4 h-4" />
                     </div>
                     <input
@@ -305,25 +317,25 @@ const Register = () => {
                       value={dateOfBirth}
                       onChange={(e) => setDateOfBirth(e.target.value)}
                       required
-                      className="w-full pl-10 pr-4 py-3 rounded-xl glass-input text-sm outline-none"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all shadow-sm"
                     />
                   </div>
                 </div>
 
                 {/* Gender */}
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-[0.15em] mb-2">
+                  <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-[0.15em] mb-2">
                     Género *
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                       <Users className="w-4 h-4" />
                     </div>
                     <select
                       value={gender}
                       onChange={(e) => setGender(e.target.value)}
                       required
-                      className="w-full pl-10 pr-4 py-3 rounded-xl glass-input text-sm outline-none appearance-none cursor-pointer"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm outline-none appearance-none cursor-pointer focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all shadow-sm"
                     >
                       <option value="" disabled className="text-slate-500">Seleccione su género</option>
                       <option value="M" className="text-slate-900">Masculino</option>
@@ -334,18 +346,18 @@ const Register = () => {
 
                 {/* Assigned Doctor */}
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-[0.15em] mb-2">
+                  <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-[0.15em] mb-2">
                     Doctor que lo atenderá *
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                       <Stethoscope className="w-4 h-4" />
                     </div>
                     <select
                       value={doctorId}
                       onChange={(e) => setDoctorId(e.target.value)}
                       required
-                      className="w-full pl-10 pr-4 py-3 rounded-xl glass-input text-sm outline-none appearance-none cursor-pointer"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm outline-none appearance-none cursor-pointer focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all shadow-sm"
                     >
                       <option value="" disabled className="text-slate-500">Seleccione un doctor</option>
                       {doctors.map((doc) => (
@@ -364,7 +376,7 @@ const Register = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full mt-3 py-3 px-4 rounded-xl btn-primary text-white font-semibold text-sm flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="w-full mt-3 py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-sm flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-lg shadow-cyan-500/25 transition-all"
               >
                 {isSubmitting ? (
                   <>
@@ -385,10 +397,12 @@ const Register = () => {
         {/* Footer */}
         <p className="text-center text-xs text-slate-500 mt-6">
           ¿Ya tienes cuenta?{' '}
-          <Link to="/login" className="text-brand-400 hover:text-brand-300 font-semibold transition-colors">
+          <Link to="/login" className="text-cyan-600 hover:text-cyan-500 font-semibold transition-colors">
             Inicia sesión
           </Link>
         </p>
+        </div>
+        </div>
       </div>
     </div>
   );
