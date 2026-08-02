@@ -48,11 +48,11 @@ const Login = () => {
       <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-10 items-center relative z-10">
 
         {/* Left: Cover Image */}
-        <div className="hidden lg:block rounded-2xl overflow-hidden shadow-2xl shadow-cyan-200/50 border border-white">
+        <div className="hidden lg:flex items-center justify-center rounded-2xl overflow-hidden shadow-2xl shadow-cyan-200/50 border border-white max-h-[calc(100vh-6rem)]">
           <img
             src={portada}
             alt="Portada EliaOcular"
-            className="w-full h-full object-cover"
+            className="w-full h-auto object-contain max-h-[calc(100vh-6rem)]"
           />
         </div>
 
