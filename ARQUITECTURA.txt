@@ -1,4 +1,19 @@
-================================================================================
+==========================================================
+Cuenta :
+Adnistrador
+correo:admin@example.com
+contraseña:123456
+
+Doctor
+correo:medico@example.com
+contraseña:123456
+
+Paciente1
+correo:
+contraseña:
+
+
+======================
                 ELIAOCULAR - ARQUITECTURA DEL SISTEMA
 ================================================================================
 
