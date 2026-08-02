@@ -88,6 +88,11 @@ export const listDoctors = async () => {
   return response.data;
 };
 
+export const listPublicDoctors = async () => {
+  const response = await axiosInstance.get('/doctors/public');
+  return response.data;
+};
+
 export const getDoctor = async (doctorId) => {
   const response = await axiosInstance.get(`/doctors/${doctorId}`);
   return response.data;

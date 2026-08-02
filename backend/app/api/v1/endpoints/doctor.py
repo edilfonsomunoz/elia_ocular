@@ -50,6 +50,34 @@ def create_doctor(
     return db_doctor
 
 
+@router.get("/public", response_model=List[DoctorWithUser])
+def list_public_doctors(
+    *,
+    db: Session = Depends(deps.get_db),
+) -> Any:
+    """
+    Listar doctores disponibles sin autenticacion (para registro publico).
+    """
+    doctors = db.query(Doctor).all()
+    result = []
+    for doctor in doctors:
+        user = db.query(User).filter(User.id == doctor.user_id).first()
+        result.append(DoctorWithUser(
+            id=doctor.id,
+            user_id=doctor.user_id,
+            license_number=doctor.license_number,
+            specialty=doctor.specialty,
+            hospital=doctor.hospital,
+            years_experience=doctor.years_experience,
+            bio=doctor.bio,
+            created_at=doctor.created_at,
+            updated_at=doctor.updated_at,
+            full_name=user.full_name if user else "",
+            email=user.email if user else ""
+        ))
+    return result
+
+
 @router.get("/", response_model=List[DoctorWithUser])
 def list_doctors(
     *,

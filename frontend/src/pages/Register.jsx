@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { listDoctors } from '../api/medical';
+import { listPublicDoctors } from '../api/medical';
 import { User, Mail, Lock, Eye, EyeOff, UserPlus, AlertCircle, CheckCircle2, ArrowRight, UserCheck, Shield, CreditCard, Calendar, Users, Stethoscope } from 'lucide-react';
 
 const Register = () => {
@@ -26,7 +26,7 @@ const Register = () => {
   useEffect(() => {
     const loadDoctors = async () => {
       try {
-        const data = await listDoctors();
+        const data = await listPublicDoctors();
         setDoctors(data);
       } catch (e) {
         console.error('Error al cargar doctores:', e);
