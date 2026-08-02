@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { listPatients, getPatientHistory, deletePatient } from '../../api/medical';
+import { useAuth } from '../../context/AuthContext';
 import { Users, Plus, History, Search, Trash2, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 
 const PatientList = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'administrador';
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -134,29 +137,42 @@ const PatientList = () => {
               </div>
             </div>
 
-            <div className="flex space-x-2">
-              <button
-                onClick={() => navigate(`/medical/history/${patient.id}`)}
-                className="flex-1 flex items-center justify-center space-x-2 p-2 bg-slate-800/50 rounded-lg hover:bg-slate-700/50 transition-colors"
-              >
-                <History className="w-4 h-4" />
-                <span className="text-sm">Historial</span>
-              </button>
-              <button
-                onClick={() => navigate('/medical/upload')}
-                className="flex-1 flex items-center justify-center space-x-2 p-2 bg-cyan-500/20 text-cyan-400 rounded-lg hover:bg-cyan-500/30 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                <span className="text-sm">Diagnóstico</span>
-              </button>
-              <button
-                onClick={() => setConfirmDelete(patient)}
-                title="Eliminar"
-                className="p-2 bg-red-500/15 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
+            {isAdmin ? (
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setConfirmDelete(patient)}
+                  title="Eliminar"
+                  className="flex-1 flex items-center justify-center space-x-2 p-2 bg-red-500/15 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span className="text-sm">Eliminar</span>
+                </button>
+              </div>
+            ) : (
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => navigate(`/medical/history/${patient.id}`)}
+                  className="flex-1 flex items-center justify-center space-x-2 p-2 bg-slate-800/50 rounded-lg hover:bg-slate-700/50 transition-colors"
+                >
+                  <History className="w-4 h-4" />
+                  <span className="text-sm">Historial</span>
+                </button>
+                <button
+                  onClick={() => navigate('/medical/upload')}
+                  className="flex-1 flex items-center justify-center space-x-2 p-2 bg-cyan-500/20 text-cyan-400 rounded-lg hover:bg-cyan-500/30 transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="text-sm">Diagnóstico</span>
+                </button>
+                <button
+                  onClick={() => setConfirmDelete(patient)}
+                  title="Eliminar"
+                  className="p-2 bg-red-500/15 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>

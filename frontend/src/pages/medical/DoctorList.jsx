@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { listDoctors, updateDoctor, deleteDoctor } from '../../api/medical';
 import { useAuth } from '../../context/AuthContext';
-import { Stethoscope, Search, Pencil, Trash2, X, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Stethoscope, Search, Pencil, Trash2, X, Loader2, CheckCircle, AlertCircle, Plus } from 'lucide-react';
 
 const DoctorList = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -103,9 +105,20 @@ const DoctorList = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Médicos</h1>
-        <p className="text-slate-400">{doctors.length} médicos registrados</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Médicos</h1>
+          <p className="text-slate-400">{doctors.length} médicos registrados</p>
+        </div>
+        {isAdmin && (
+          <button
+            onClick={() => navigate('/medical/doctors/new')}
+            className="btn-primary px-4 py-2 rounded-lg flex items-center space-x-2"
+          >
+            <Plus className="w-5 h-5" />
+            <span>Nuevo Médico</span>
+          </button>
+        )}
       </div>
 
       {message.text && (

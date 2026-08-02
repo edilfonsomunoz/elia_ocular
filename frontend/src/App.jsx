@@ -21,6 +21,7 @@ import MedicalHistory from './pages/medical/MedicalHistory';
 import PatientList from './pages/medical/PatientList';
 import PatientCreate from './pages/medical/PatientCreate';
 import DoctorList from './pages/medical/DoctorList';
+import DoctorCreate from './pages/medical/DoctorCreate';
 import MedicalDashboard from './pages/medical/MedicalDashboard';
 import MedicalResults from './pages/medical/MedicalResults';
 
@@ -74,6 +75,7 @@ function App() {
             <Route path="patients" element={<PatientList />} />
             <Route path="patients/new" element={<PatientCreate />} />
             <Route path="doctors" element={<DoctorList />} />
+            <Route path="doctors/new" element={<DoctorCreate />} />
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
