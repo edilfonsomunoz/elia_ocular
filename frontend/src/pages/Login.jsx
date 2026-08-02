@@ -40,24 +40,25 @@ const Login = () => {
   const inputCls = "w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all placeholder:text-slate-400 shadow-sm";
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-cyan-50">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-cyan-50">
       {/* Decorative Elements */}
-      <div className="absolute top-20 left-10 w-72 h-72 bg-cyan-200/40 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-20 right-10 w-72 h-72 bg-cyan-200/40 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-200/40 rounded-full blur-[100px] pointer-events-none" />
 
-      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-10 items-center relative z-10">
+      <div className="w-full h-full grid grid-cols-1 lg:grid-cols-2 relative z-10">
 
-        {/* Left: Cover Image */}
-        <div className="hidden lg:flex items-center justify-start rounded-2xl overflow-hidden shadow-2xl shadow-cyan-200/50 border border-white max-h-[calc(100vh-6rem)]">
+        {/* Left: Cover Image full-width to the left edge */}
+        <div className="hidden lg:flex relative overflow-hidden">
           <img
             src={portada}
             alt="Portada EliaOcular"
-            className="w-full h-auto object-contain max-h-[calc(100vh-6rem)]"
+            className="w-full h-full object-cover object-left"
           />
         </div>
 
         {/* Right: Form */}
-        <div className="w-full max-w-[420px] justify-self-center lg:justify-self-end animate-scaleIn">
+        <div className="w-full flex items-center justify-center min-h-[calc(100vh-4rem)] py-10">
+          <div className="w-full max-w-[420px] animate-scaleIn">
         
         {/* Logo Header */}
         <div className="text-center mb-8">
@@ -170,6 +171,7 @@ const Login = () => {
             Regístrate aquí
           </Link>
         </p>
+        </div>
         </div>
       </div>
     </div>
