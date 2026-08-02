@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { registerApi } from '../../api/auth';
 import { listDoctors } from '../../api/medical';
 import { User, Mail, Lock, UserPlus, AlertCircle, CheckCircle2, CreditCard, Calendar, Users, Stethoscope, ArrowLeft, Phone, MapPin, FileText } from 'lucide-react';
 
 const PatientCreate = () => {
-  const { user, register } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -51,30 +52,28 @@ const PatientCreate = () => {
     }
 
     setIsSubmitting(true);
-    const result = await register(
-      fullName,
-      email,
-      password,
-      'paciente',
-      {
+    try {
+      await registerApi({
+        full_name: fullName,
+        email: email,
+        password: password,
+        role: 'paciente',
         document_number: documentNumber,
         date_of_birth: dateOfBirth,
         gender: gender,
         phone: phone || null,
         address: address || null,
         medical_history: medicalHistory || null,
-      },
-      doctorId ? Number(doctorId) : null
-    );
-    setIsSubmitting(false);
-
-    if (result.success) {
+        doctor_id: doctorId ? Number(doctorId) : null,
+      });
       setSuccess('Paciente creado exitosamente.');
       setTimeout(() => {
         navigate('/medical/patients');
       }, 1200);
-    } else {
-      setError(result.error);
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Error al crear el paciente. Verifica los datos.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
