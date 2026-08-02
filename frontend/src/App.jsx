@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
@@ -26,9 +26,12 @@ import MedicalDashboard from './pages/medical/MedicalDashboard';
 import MedicalResults from './pages/medical/MedicalResults';
 
 function App() {
+  const location = useLocation();
+  const hideNavbar = location.pathname === '/login' || location.pathname === '/register';
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 dark:bg-slate-950 dark:text-slate-100 flex flex-col font-sans transition-colors duration-300">
-      <Navbar />
+      {!hideNavbar && <Navbar />}
       <main className="flex-grow">
         <Routes>
           <Route path="/login" element={<Login />} />

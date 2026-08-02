@@ -54,7 +54,14 @@ const Login = () => {
               <ShieldCheck className="w-8 h-8 text-white" />
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Bienvenido de vuelta</h1>
+          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">EliaOcular</h1>
+          <p className="text-sm font-semibold text-cyan-600 mt-1 tracking-wide">
+            Sistema de Diagnóstico Ocular
+          </p>
+          <div className="my-4 flex items-center justify-center">
+            <div className="w-16 h-px bg-slate-200" />
+          </div>
+          <h2 className="text-lg font-bold text-slate-700">Bienvenido de vuelta</h2>
           <p className="text-sm text-slate-500 mt-1.5">
             Ingresa tus credenciales para acceder al sistema
           </p>
