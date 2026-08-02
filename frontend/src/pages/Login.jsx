@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Mail, Lock, Eye, EyeOff, LogIn, AlertCircle, ShieldCheck, ArrowRight } from 'lucide-react';
+import portada from '../login/portada.png';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -44,7 +45,19 @@ const Login = () => {
       <div className="absolute top-20 left-10 w-72 h-72 bg-cyan-200/40 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-200/40 rounded-full blur-[100px] pointer-events-none" />
 
-      <div className="w-full max-w-[420px] relative z-10 animate-scaleIn">
+      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-10 items-center relative z-10">
+
+        {/* Left: Cover Image */}
+        <div className="hidden lg:block rounded-2xl overflow-hidden shadow-2xl shadow-cyan-200/50 border border-white">
+          <img
+            src={portada}
+            alt="Portada EliaOcular"
+            className="w-full h-full object-cover"
+          />
+        </div>
+
+        {/* Right: Form */}
+        <div className="w-full max-w-[420px] justify-self-center lg:justify-self-end animate-scaleIn">
         
         {/* Logo Header */}
         <div className="text-center mb-8">
@@ -157,6 +170,7 @@ const Login = () => {
             Regístrate aquí
           </Link>
         </p>
+        </div>
       </div>
     </div>
   );
