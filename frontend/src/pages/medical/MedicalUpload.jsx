@@ -14,6 +14,7 @@ const MedicalUpload = () => {
   const [diagnosing, setDiagnosing] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [diagnosisResult, setDiagnosisResult] = useState(null);
+  const [uploadedImageId, setUploadedImageId] = useState(null);
   const [patientsError, setPatientsError] = useState('');
 
   useEffect(() => {
@@ -39,6 +40,8 @@ const MedicalUpload = () => {
     if (selectedFile) {
       setFile(selectedFile);
       setDiagnosisResult(null);
+      setUploadedImageId(null);
+      setMessage({ type: '', text: '' });
       const reader = new FileReader();
       reader.onload = (e) => setPreview(e.target.result);
       reader.readAsDataURL(selectedFile);
@@ -54,6 +57,7 @@ const MedicalUpload = () => {
     setUploading(true);
     setMessage({ type: '', text: '' });
     setDiagnosisResult(null);
+    setUploadedImageId(null);
 
     try {
       const formData = new FormData();
@@ -63,21 +67,32 @@ const MedicalUpload = () => {
       formData.append('description', description);
 
       const uploadedImage = await uploadMedicalImage(formData);
-      setMessage({ type: 'success', text: 'Imagen subida exitosamente' });
-
-      setDiagnosing(true);
-      try {
-        const diagnosis = await diagnoseImage(uploadedImage.id);
-        setDiagnosisResult(diagnosis);
-        setImageType(diagnosis.disease);
-        setMessage({ type: 'success', text: 'Diagnostico completado exitosamente' });
-      } catch (diagError) {
-        setMessage({ type: 'warning', text: 'Imagen subida, pero el diagnostico fallo. El modelo de IA no esta disponible.' });
-      }
+      setUploadedImageId(uploadedImage.id);
+      setMessage({ type: 'success', text: 'Imagen subida exitosamente. Pulse Diagnosticar para obtener el resultado.' });
     } catch (error) {
       setMessage({ type: 'error', text: error.response?.data?.detail || 'Error al subir la imagen' });
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleDiagnose = async () => {
+    if (!uploadedImageId) {
+      setMessage({ type: 'error', text: 'Primero suba una imagen' });
+      return;
+    }
+
+    setDiagnosing(true);
+    setMessage({ type: '', text: '' });
+
+    try {
+      const diagnosis = await diagnoseImage(uploadedImageId);
+      setDiagnosisResult(diagnosis);
+      setImageType(diagnosis.disease);
+      setMessage({ type: 'success', text: 'Diagnostico completado exitosamente' });
+    } catch (diagError) {
+      setMessage({ type: 'warning', text: 'El diagnostico fallo. El modelo de IA no esta disponible.' });
+    } finally {
       setDiagnosing(false);
     }
   };
@@ -86,6 +101,7 @@ const MedicalUpload = () => {
     setFile(null);
     setPreview(null);
     setDiagnosisResult(null);
+    setUploadedImageId(null);
     setMessage({ type: '', text: '' });
     setDescription('');
   };
@@ -201,18 +217,35 @@ const MedicalUpload = () => {
           <div className="flex gap-3">
             <button
               onClick={handleUpload}
-              disabled={!file || !selectedPatient || uploading || diagnosing}
+              disabled={!file || !selectedPatient || uploading || diagnosing || !!uploadedImageId}
               className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-cyan-500/20"
             >
-              {uploading || diagnosing ? (
+              {uploading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>{uploading ? 'Subiendo...' : 'Diagnosticando...'}</span>
+                  <span>Subiendo...</span>
                 </>
               ) : (
                 <>
                   <Upload className="w-4 h-4" />
-                  <span>Subir y Diagnosticar</span>
+                  <span>Subir</span>
+                </>
+              )}
+            </button>
+            <button
+              onClick={handleDiagnose}
+              disabled={!uploadedImageId || diagnosing || uploading}
+              className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-emerald-500/20"
+            >
+              {diagnosing ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Diagnosticando...</span>
+                </>
+              ) : (
+                <>
+                  <Activity className="w-4 h-4" />
+                  <span>Diagnosticar</span>
                 </>
               )}
             </button>
