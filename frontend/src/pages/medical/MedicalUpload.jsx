@@ -70,7 +70,19 @@ const MedicalUpload = () => {
       setUploadedImageId(uploadedImage.id);
       setMessage({ type: 'success', text: 'Imagen subida exitosamente. Pulse Diagnosticar para obtener el resultado.' });
     } catch (error) {
-      setMessage({ type: 'error', text: error.response?.data?.detail || 'Error al subir la imagen' });
+      const data = error.response?.data;
+      let text = 'Error al subir la imagen. Verifique el tamaño y el formato.';
+      if (data && typeof data.detail === 'string') {
+        text = data.detail;
+      } else if (Array.isArray(data?.detail)) {
+        text = data.detail.map((d) => d.msg).join('. ');
+      } else if (error.response?.status) {
+        text = `Error del servidor (${error.response.status}) al subir la imagen.`;
+      } else if (error.code === 'ECONNABORTED') {
+        text = 'La subida tardó demasiado. Intente con una imagen más pequeña.';
+      }
+      console.error('Error al subir imagen:', error);
+      setMessage({ type: 'error', text });
     } finally {
       setUploading(false);
     }

@@ -1,12 +1,9 @@
 import axiosInstance from './axios';
-import axios from 'axios';
 
 export const uploadMedicalImage = async (formData) => {
-  const token = localStorage.getItem('token');
-  const response = await axios.post('/api/v1/medical/upload', formData, {
-    headers: {
-      ...(token ? { Authorization: `Bearer ${token}` } : {})
-    }
+  const response = await axiosInstance.post('/medical/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 120000,
   });
   return response.data;
 };
