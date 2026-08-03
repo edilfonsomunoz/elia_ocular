@@ -108,12 +108,12 @@ const Register = () => {
 
       <div className="w-full h-full grid grid-cols-1 lg:grid-cols-2 items-start relative z-10">
 
-        {/* Left: Cover Image pinned, not stretched by tall form */}
+        {/* Left: Cover Image pinned, full image visible */}
         <div className="hidden lg:block sticky top-0 min-h-[calc(100vh-4rem)] relative overflow-hidden">
           <img
             src={portada}
             alt="Portada EliaOcular"
-            className="absolute inset-0 w-full h-full object-cover object-left"
+            className="absolute inset-0 w-full h-full object-contain object-left"
           />
         </div>
 

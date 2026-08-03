@@ -45,19 +45,19 @@ const Login = () => {
       <div className="absolute top-20 right-10 w-72 h-72 bg-cyan-200/40 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-200/40 rounded-full blur-[100px] pointer-events-none" />
 
-      <div className="w-full h-full grid grid-cols-1 lg:grid-cols-2 relative z-10">
+      <div className="w-full h-full grid grid-cols-1 lg:grid-cols-2 items-start relative z-10">
 
-        {/* Left: Cover Image full-width to the left edge */}
-        <div className="hidden lg:flex relative overflow-hidden">
+        {/* Left: Cover Image pinned, full image visible */}
+        <div className="hidden lg:block sticky top-0 min-h-[calc(100vh-4rem)] relative overflow-hidden">
           <img
             src={portada}
             alt="Portada EliaOcular"
-            className="w-full h-full object-cover object-left"
+            className="absolute inset-0 w-full h-full object-contain object-left"
           />
         </div>
 
-        {/* Right: Form */}
-        <div className="w-full flex items-center justify-center min-h-[calc(100vh-4rem)] py-10">
+        {/* Right: Form scrollable */}
+        <div className="w-full flex items-center justify-center min-h-[calc(100vh-4rem)] py-10 overflow-y-auto">
           <div className="w-full max-w-[420px] animate-scaleIn">
         
         {/* Logo Header */}
