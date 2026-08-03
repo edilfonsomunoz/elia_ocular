@@ -71,7 +71,19 @@ const PatientCreate = () => {
         navigate('/medical/patients');
       }, 1200);
     } catch (err) {
-      setError(err.response?.data?.detail || 'Error al crear el paciente. Verifica los datos.');
+      const data = err.response?.data;
+      let message = 'Error al crear el paciente. Verifica los datos.';
+      if (data && typeof data.detail === 'string') {
+        message = data.detail;
+      } else if (Array.isArray(data?.detail)) {
+        message = data.detail.map((d) => d.msg).join('. ');
+      } else if (err.response?.status) {
+        message = `Error del servidor (${err.response.status}). ${message}`;
+      } else if (err.message) {
+        message = err.message;
+      }
+      console.error('Error al crear paciente:', err);
+      setError(message);
     } finally {
       setIsSubmitting(false);
     }

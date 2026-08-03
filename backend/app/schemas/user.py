@@ -15,6 +15,9 @@ class UserCreate(UserBase):
     date_of_birth: Optional[date] = None
     gender: Optional[str] = None
     doctor_id: Optional[int] = None
+    phone: Optional[str] = Field(None, max_length=20)
+    address: Optional[str] = None
+    medical_history: Optional[str] = None
 
 
 class UserLogin(BaseModel):

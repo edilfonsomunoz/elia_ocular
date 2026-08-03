@@ -68,6 +68,9 @@ def register_user(
             document_number=user_in.document_number,
             date_of_birth=user_in.date_of_birth,
             gender=user_in.gender,
+            phone=user_in.phone,
+            address=user_in.address,
+            medical_history=user_in.medical_history,
         ))
 
     db.commit()
