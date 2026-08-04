@@ -15,6 +15,7 @@ from app.models.doctor import Doctor
 from app.models.medical_image import MedicalImage
 from app.models.diagnosis import Diagnosis
 from app.models.clinical_history import ClinicalHistory
+from app.models.report import Report
 from app.schemas.diagnosis import DiagnosisCreate, DiagnosisResponse, DiagnosisWithDetails
 from app.schemas.medical_image import MedicalImageResponse, MedicalImageWithPatient
 
@@ -502,6 +503,8 @@ def delete_result(
 
     image = db.query(MedicalImage).filter(MedicalImage.id == diagnosis.image_id).first()
 
+    db.query(Report).filter(Report.diagnosis_id == result_id).delete()
+    db.query(ClinicalHistory).filter(ClinicalHistory.diagnosis_id == result_id).delete()
     db.delete(diagnosis)
     db.commit()
 
