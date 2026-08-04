@@ -49,8 +49,8 @@ const MedicalUpload = () => {
   };
 
   const handleUpload = async () => {
-    if (!file || !selectedPatient) {
-      setMessage({ type: 'error', text: 'Por favor seleccione un paciente y una imagen' });
+    if (!file || !selectedPatient || !imageType) {
+      setMessage({ type: 'error', text: 'Por favor seleccione un paciente, tipo de imagen e imagen' });
       return;
     }
 
@@ -63,7 +63,7 @@ const MedicalUpload = () => {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('patient_id', selectedPatient);
-      formData.append('image_type', 'retina');
+      formData.append('image_type', imageType);
       formData.append('description', description);
 
       const uploadedImage = await uploadMedicalImage(formData);
@@ -115,6 +115,7 @@ const MedicalUpload = () => {
     setDiagnosisResult(null);
     setUploadedImageId(null);
     setMessage({ type: '', text: '' });
+    setImageType('');
     setDescription('');
   };
 
@@ -185,9 +186,16 @@ const MedicalUpload = () => {
             <label className="block text-[11px] text-slate-500 uppercase tracking-wider font-semibold mb-2">
               Tipo de Imagen / Enfermedad *
             </label>
-            <div className="w-full bg-slate-800 border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white">
-              {imageType || 'Se detectara automaticamente al diagnosticar'}
-            </div>
+            <select
+              value={imageType}
+              onChange={(e) => setImageType(e.target.value)}
+              className="w-full bg-slate-800 border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white focus:border-cyan-500/50 focus:outline-none transition-colors"
+            >
+              <option value="" className="bg-slate-800 text-white">Seleccione tipo de imagen</option>
+              <option value="Catarata" className="bg-slate-800 text-white">Catarata</option>
+              <option value="Glaucoma" className="bg-slate-800 text-white">Glaucoma</option>
+              <option value="Miopía" className="bg-slate-800 text-white">Miopía</option>
+            </select>
           </div>
 
           <div>
@@ -229,7 +237,7 @@ const MedicalUpload = () => {
           <div className="flex gap-3">
             <button
               onClick={handleUpload}
-              disabled={!file || !selectedPatient || uploading || diagnosing || !!uploadedImageId}
+              disabled={!file || !selectedPatient || !imageType || uploading || diagnosing || !!uploadedImageId}
               className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-cyan-500/20"
             >
               {uploading ? (
