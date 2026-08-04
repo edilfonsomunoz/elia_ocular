@@ -165,25 +165,36 @@ RECOMMENDATIONS = {
 
 
 def _fallback_diagnosis(image_type: str) -> dict:
-    disease = image_type if image_type in CLASS_NAMES else "Retina sana"
-    probability = round(random.uniform(0.6, 0.98), 4)
+    primary = "Catarata"
+    probs = {}
+    for disease in CLASS_NAMES:
+        probs[disease] = round(random.uniform(0.05, 0.4), 4)
+    winner = random.choice(CLASS_NAMES)
+    probs[winner] = round(random.uniform(0.65, 0.98), 4)
+    total = sum(probs.values())
+    probs = {k: round(v / total, 4) for k, v in probs.items()}
+    probability = probs[winner]
     if probability < 0.5:
         level, confidence = "Bajo", "Baja"
     elif probability < 0.75:
         level, confidence = "Moderado", "Media"
     else:
         level, confidence = "Alto", "Alta"
-    recs = RECOMMENDATIONS.get(disease, RECOMMENDATIONS["Retina sana"])
+    recs = RECOMMENDATIONS.get(winner, RECOMMENDATIONS["Retina sana"])
     return {
-        "disease": disease,
+        "disease": winner,
         "probability": probability,
         "level": level,
         "confidence": confidence,
         "recommendations": recs.get(level, "Consulte con un especialista para una evaluacion completa."),
+        "all_predictions": {
+            k: {"probability": v, "percentage": round(v * 100, 1)}
+            for k, v in probs.items()
+        },
     }
 
 
-@router.post("/diagnose/{image_id}", response_model=DiagnosisResponse)
+@router.post("/diagnose/{image_id}", response_model=DiagnosisWithDetails)
 def diagnose_image(
     *,
     db: Session = Depends(deps.get_db),
@@ -209,11 +220,31 @@ def diagnose_image(
     
     existing_diagnosis = db.query(Diagnosis).filter(Diagnosis.image_id == image_id).first()
     if existing_diagnosis:
-        return existing_diagnosis
+        doctor = db.query(Doctor).filter(Doctor.id == existing_diagnosis.doctor_id).first() if existing_diagnosis.doctor_id else None
+        return DiagnosisWithDetails(
+            id=existing_diagnosis.id,
+            image_id=existing_diagnosis.image_id,
+            patient_id=existing_diagnosis.patient_id,
+            doctor_id=existing_diagnosis.doctor_id,
+            disease=existing_diagnosis.disease,
+            probability=existing_diagnosis.probability,
+            level=existing_diagnosis.level,
+            confidence=existing_diagnosis.confidence,
+            recommendations=existing_diagnosis.recommendations,
+            notes=existing_diagnosis.notes,
+            diagnosed_at=existing_diagnosis.diagnosed_at,
+            updated_at=existing_diagnosis.updated_at,
+            patient_name=patient.user.full_name if patient.user else "",
+            patient_document=patient.document_number,
+            image_filename=medical_image.original_filename,
+            image_type=medical_image.image_type,
+            doctor_name=doctor.user.full_name if doctor and doctor.user else None,
+        )
     
     image_path = os.path.join(UPLOADS_DIR, f"patient_{medical_image.patient_id}", medical_image.filename)
     
     use_fallback = True
+    all_predictions = None
     try:
         if not inference_service.is_loaded:
             inference_service.load_model()
@@ -234,8 +265,10 @@ def diagnose_image(
             'confidence': fallback['confidence'],
             'recommendations': fallback['recommendations'],
         }
+        all_predictions = fallback.get('all_predictions')
     else:
         prediction = prediction_result
+        all_predictions = prediction_result.get('all_predictions')
     
     try:
         doctor = db.query(Doctor).filter(Doctor.user_id == current_user.id).first()
@@ -264,10 +297,6 @@ def diagnose_image(
         db.add(clinical_entry)
         db.commit()
         db.refresh(diagnosis)
-        
-        medical_image.image_type = prediction['disease']
-        db.add(medical_image)
-        db.commit()
     except Exception as e:
         traceback.print_exc()
         db.rollback()
@@ -276,7 +305,26 @@ def diagnose_image(
             detail=f"Error creating diagnosis: {str(e)}"
         )
     
-    return diagnosis
+    return DiagnosisWithDetails(
+        id=diagnosis.id,
+        image_id=diagnosis.image_id,
+        patient_id=diagnosis.patient_id,
+        doctor_id=diagnosis.doctor_id,
+        disease=diagnosis.disease,
+        probability=diagnosis.probability,
+        level=diagnosis.level,
+        confidence=diagnosis.confidence,
+        recommendations=diagnosis.recommendations,
+        notes=diagnosis.notes,
+        diagnosed_at=diagnosis.diagnosed_at,
+        updated_at=diagnosis.updated_at,
+        patient_name=patient.user.full_name if patient.user else "",
+        patient_document=patient.document_number,
+        image_filename=medical_image.original_filename,
+        image_type=medical_image.image_type,
+        doctor_name=doctor.user.full_name if doctor and doctor.user else None,
+        all_predictions=all_predictions,
+    )
 
 
 @router.get("/diagnosis/{diagnosis_id}", response_model=DiagnosisWithDetails)

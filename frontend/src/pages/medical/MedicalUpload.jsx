@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { uploadMedicalImage, listPatients, diagnoseImage } from '../../api/medical';
-import { Upload, Image, AlertCircle, CheckCircle, Loader2, Activity, Stethoscope, TrendingUp, Heart, Brain } from 'lucide-react';
+import { Upload, Image, AlertCircle, CheckCircle, Loader2, Activity, Stethoscope, TrendingUp, Heart, Brain, BarChart2 } from 'lucide-react';
 
 const MedicalUpload = () => {
   const [patients, setPatients] = useState([]);
@@ -63,7 +63,7 @@ const MedicalUpload = () => {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('patient_id', selectedPatient);
-      formData.append('image_type', 'Catarata');
+      formData.append('image_type', 'retina');
       formData.append('description', description);
 
       const uploadedImage = await uploadMedicalImage(formData);
@@ -377,6 +377,47 @@ const MedicalUpload = () => {
                     Recomendaciones
                   </span>
                   <p className="text-xs text-slate-300 leading-relaxed">{diagnosisResult.recommendations}</p>
+                </div>
+              )}
+
+              {diagnosisResult.all_predictions && (
+                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                  <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold block mb-3 flex items-center gap-1.5">
+                    <BarChart2 className="w-3 h-3 text-purple-400" />
+                    Probabilidad por Enfermedad
+                  </span>
+                  <div className="space-y-2.5">
+                    {Object.entries(diagnosisResult.all_predictions)
+                      .sort((a, b) => b[1].probability - a[1].probability)
+                      .map(([name, data]) => {
+                        const pct = (data.probability * 100).toFixed(1);
+                        const isDetected = name === diagnosisResult.disease;
+                        const barColor =
+                          name === 'Catarata' ? 'from-amber-500 to-amber-400' :
+                          name === 'Glaucoma' ? 'from-red-500 to-red-400' :
+                          name === 'Retinopatía diabética' ? 'from-purple-500 to-purple-400' :
+                          name === 'Degeneración macular' ? 'from-blue-500 to-blue-400' :
+                          'from-emerald-500 to-emerald-400';
+                        return (
+                          <div key={name}>
+                            <div className="flex justify-between items-center mb-1">
+                              <span className={`text-[11px] font-semibold ${isDetected ? 'text-white' : 'text-slate-400'}`}>
+                                {name} {isDetected && '✓'}
+                              </span>
+                              <span className={`text-[11px] font-bold ${isDetected ? 'text-cyan-400' : 'text-slate-500'}`}>
+                                {pct}%
+                              </span>
+                            </div>
+                            <div className="w-full h-2 bg-slate-800/60 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full bg-gradient-to-r ${barColor} transition-all duration-700`}
+                                style={{ width: `${pct}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
                 </div>
               )}
             </div>

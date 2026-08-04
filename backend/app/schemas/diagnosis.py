@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict, Any
 from pydantic import BaseModel, Field, ConfigDict
 
 
@@ -39,3 +39,4 @@ class DiagnosisWithDetails(DiagnosisResponse):
     image_filename: str
     image_type: str
     doctor_name: Optional[str] = None
+    all_predictions: Optional[Dict[str, Any]] = None
