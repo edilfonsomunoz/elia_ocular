@@ -128,6 +128,11 @@ class OcularInference:
                 "Moderado": "Miopía moderada detectada. Se recomienda evaluación oftalmológica completa y posibles opciones de corrección.",
                 "Alto": "Miopía alta detectada. Se requiere evaluación urgente para prevenir complicaciones retinianas.",
             },
+            "Normal": {
+                "Bajo": "El ojo se encuentra saludable. Se recomienda revisiones periódicas de rutina.",
+                "Moderado": "El ojo se encuentra saludable. Continúe con revisiones periódicas.",
+                "Alto": "El ojo se encuentra saludable. Mantenga hábitos saludables y revisiones regulares.",
+            },
         }
         disease_recs = recommendations.get(disease, {})
         return disease_recs.get(level, "Consulte con un especialista para una evaluación completa.")

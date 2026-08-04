@@ -10,12 +10,13 @@ IMAGE_SIZE = (224, 224)
 BATCH_SIZE = 32
 EPOCHS = 30
 LEARNING_RATE = 0.001
-NUM_CLASSES = 3
+NUM_CLASSES = 4
 
 CLASS_NAMES = [
     "Catarata",
     "Glaucoma",
     "Miopía",
+    "Normal",
 ]
 
 IMAGE_TYPES = ["Catarata", "Glaucoma", "Miopía"]

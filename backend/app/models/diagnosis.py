@@ -10,6 +10,7 @@ class DiseaseType(str, enum.Enum):
     CATARATA = "Catarata"
     GLAUCOMA = "Glaucoma"
     MIOPIA = "Miopía"
+    NORMAL = "Normal"
 
 
 class DiagnosisLevel(str, enum.Enum):

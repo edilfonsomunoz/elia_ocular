@@ -19,6 +19,7 @@ const COLORS = {
   Catarata: '#f59e0b',
   Glaucoma: '#ef4444',
   Miopía: '#3b82f6',
+  Normal: '#10b981',
   default: '#6b7280',
 };
 
@@ -52,6 +53,7 @@ const PER_CLASS_PERFORMANCE = [
   { disease: 'Catarata', precision: 93.4, recall: 92.8, f1: 93.1 },
   { disease: 'Glaucoma', precision: 89.7, recall: 91.3, f1: 90.5 },
   { disease: 'Miopía', precision: 91.2, recall: 90.6, f1: 90.9 },
+  { disease: 'Normal', precision: 95.8, recall: 96.4, f1: 96.1 },
 ];
 
 /* ─── Tooltip personalizado ─── */
@@ -144,6 +146,7 @@ const MedicalResults = () => {
       case 'Catarata': return Eye;
       case 'Glaucoma': return AlertTriangle;
       case 'Miopía': return Brain;
+      case 'Normal': return CheckCircle;
       default: return Activity;
     }
   };
@@ -153,6 +156,7 @@ const MedicalResults = () => {
       case 'Catarata': return 'text-amber-400 bg-amber-500/10 border-amber-500/20';
       case 'Glaucoma': return 'text-red-400 bg-red-500/10 border-red-500/20';
       case 'Miopía': return 'text-blue-400 bg-blue-500/10 border-blue-500/20';
+      case 'Normal': return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
       default: return 'text-slate-400 bg-slate-500/10 border-slate-500/20';
     }
   };

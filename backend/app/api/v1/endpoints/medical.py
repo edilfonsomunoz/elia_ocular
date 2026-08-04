@@ -151,6 +151,11 @@ RECOMMENDATIONS = {
         "Moderado": "Miopia moderada detectada. Se recomienda evaluacion oftalmologica completa y posibles opciones de correccion.",
         "Alto": "Miopia alta detectada. Se requiere evaluacion urgente para prevenir complicaciones retinianas.",
     },
+    "Normal": {
+        "Bajo": "El ojo se encuentra saludable. Se recomienda revisiones periodicas de rutina.",
+        "Moderado": "El ojo se encuentra saludable. Continua con revisiones periodicas.",
+        "Alto": "El ojo se encuentra saludable. Mantenha habitos saludables y revisiones regulares.",
+    },
 }
 
 

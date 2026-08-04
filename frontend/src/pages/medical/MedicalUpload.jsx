@@ -184,6 +184,7 @@ const MedicalUpload = () => {
               <option value="Catarata" className="bg-slate-800 text-white">Catarata</option>
               <option value="Glaucoma" className="bg-slate-800 text-white">Glaucoma</option>
               <option value="Miopía" className="bg-slate-800 text-white">Miopía</option>
+              <option value="Normal" className="bg-slate-800 text-white">Normal</option>
             </select>
           </div>
 
@@ -375,7 +376,8 @@ const MedicalUpload = () => {
                         const barColor =
                           name === 'Catarata' ? 'from-amber-500 to-amber-400' :
                           name === 'Glaucoma' ? 'from-red-500 to-red-400' :
-                          'from-blue-500 to-blue-400';
+                          name === 'Miopía' ? 'from-blue-500 to-blue-400' :
+                          'from-emerald-500 to-emerald-400';
                         return (
                           <div key={name}>
                             <div className="flex justify-between items-center mb-1">
