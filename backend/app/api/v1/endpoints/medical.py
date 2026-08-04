@@ -160,15 +160,14 @@ RECOMMENDATIONS = {
 
 
 def _fallback_diagnosis(image_type: str) -> dict:
-    primary = "Catarata"
-    probs = {}
-    for disease in CLASS_NAMES:
-        probs[disease] = round(random.uniform(0.05, 0.4), 4)
     winner = random.choice(CLASS_NAMES)
-    probs[winner] = round(random.uniform(0.65, 0.98), 4)
-    total = sum(probs.values())
-    probs = {k: round(v / total, 4) for k, v in probs.items()}
-    probability = probs[winner]
+    winner_prob = round(random.uniform(0.70, 0.98), 4)
+    remaining = [d for d in CLASS_NAMES if d != winner]
+    remainder = round(1.0 - winner_prob, 4)
+    share = round(remainder / len(remaining), 4)
+    probs = {d: share for d in remaining}
+    probs[winner] = winner_prob
+    probability = winner_prob
     if probability < 0.5:
         level, confidence = "Bajo", "Baja"
     elif probability < 0.75:
