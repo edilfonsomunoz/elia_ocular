@@ -18,9 +18,7 @@ import {
 const COLORS = {
   Catarata: '#f59e0b',
   Glaucoma: '#ef4444',
-  'Retinopatía diabética': '#a855f7',
-  'Degeneración macular': '#3b82f6',
-  'Retina sana': '#10b981',
+  Miopía: '#3b82f6',
   default: '#6b7280',
 };
 
@@ -51,11 +49,9 @@ const MODEL_METRICS_DATA = [
 ];
 
 const PER_CLASS_PERFORMANCE = [
-  { disease: 'Retina sana', precision: 96.1, recall: 97.2, f1: 96.6 },
   { disease: 'Catarata', precision: 93.4, recall: 92.8, f1: 93.1 },
   { disease: 'Glaucoma', precision: 89.7, recall: 91.3, f1: 90.5 },
-  { disease: 'Ret. diabética', precision: 92.1, recall: 90.6, f1: 91.3 },
-  { disease: 'Deg. macular', precision: 87.8, recall: 95.6, f1: 91.5 },
+  { disease: 'Miopía', precision: 91.2, recall: 90.6, f1: 90.9 },
 ];
 
 /* ─── Tooltip personalizado ─── */
@@ -147,9 +143,7 @@ const MedicalResults = () => {
     switch (disease) {
       case 'Catarata': return Eye;
       case 'Glaucoma': return AlertTriangle;
-      case 'Retinopatía diabética': return Activity;
-      case 'Degeneración macular': return Brain;
-      case 'Retina sana': return CheckCircle;
+      case 'Miopía': return Brain;
       default: return Activity;
     }
   };
@@ -158,9 +152,7 @@ const MedicalResults = () => {
     switch (disease) {
       case 'Catarata': return 'text-amber-400 bg-amber-500/10 border-amber-500/20';
       case 'Glaucoma': return 'text-red-400 bg-red-500/10 border-red-500/20';
-      case 'Retinopatía diabética': return 'text-purple-400 bg-purple-500/10 border-purple-500/20';
-      case 'Degeneración macular': return 'text-blue-400 bg-blue-500/10 border-blue-500/20';
-      case 'Retina sana': return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
+      case 'Miopía': return 'text-blue-400 bg-blue-500/10 border-blue-500/20';
       default: return 'text-slate-400 bg-slate-500/10 border-slate-500/20';
     }
   };

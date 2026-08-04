@@ -9,9 +9,7 @@ import enum
 class DiseaseType(str, enum.Enum):
     CATARATA = "Catarata"
     GLAUCOMA = "Glaucoma"
-    RETINOPATIA_DIABETICA = "Retinopatía diabética"
-    DEGENERACION_MACULAR = "Degeneración macular"
-    RETINA_SANA = "Retina sana"
+    MIOPIA = "Miopía"
 
 
 class DiagnosisLevel(str, enum.Enum):

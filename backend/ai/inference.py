@@ -123,20 +123,10 @@ class OcularInference:
                 "Moderado": "Indicios moderados de glaucoma. Se recomienda evaluación urgente con oftalmólogo para pruebas adicionales.",
                 "Alto": "Signos preocupantes de glaucoma. Se requiere evaluación urgente para prevenir pérdida de visión.",
             },
-            "Retinopatía diabética": {
-                "Bajo": "Signos tempranos de retinopatía diabética. Se recomienda control estricto de glucemia y seguimiento oftalmológico.",
-                "Moderado": "Retinopatía diabética moderada. Se recomienda consulta con oftalmólogo para posibles tratamientos (láser, inyecciones).",
-                "Alto": "Retinopatía diabética avanzada. Se requiere evaluación urgente para prevenir pérdida de visión severa.",
-            },
-            "Degeneración macular": {
-                "Bajo": "Posibles signos tempranos de degeneración macular. Se recomienda suplementación nutricional y seguimiento.",
-                "Moderado": "Degeneración macular moderada. Se recomienda consulta con oftalmólogo para opciones de tratamiento.",
-                "Alto": "Degeneración macular avanzada. Se requiere evaluación urgente para preservar la visión central.",
-            },
-            "Retina sana": {
-                "Bajo": "La retina aparece saludable. Se recomienda revisiones periódicas de rutina.",
-                "Moderado": "La retina aparece saludable. Continúe con revisiones periódicas.",
-                "Alto": "La retina aparece saludable. Mantenga hábitos saludables y revisiones regulares.",
+            "Miopía": {
+                "Bajo": "Se detectan signos leves de miopía. Se recomienda revisión periódica y control de la progresión.",
+                "Moderado": "Miopía moderada detectada. Se recomienda evaluación oftalmológica completa y posibles opciones de corrección.",
+                "Alto": "Miopía alta detectada. Se requiere evaluación urgente para prevenir complicaciones retinianas.",
             },
         }
         disease_recs = recommendations.get(disease, {})

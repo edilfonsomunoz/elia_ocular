@@ -146,20 +146,10 @@ RECOMMENDATIONS = {
         "Moderado": "Indicios moderados de glaucoma. Se recomienda evaluacion urgente con oftalmologo para pruebas adicionales.",
         "Alto": "Signos preocupantes de glaucoma. Se requiere evaluacion urgente para prevenir perdida de vision.",
     },
-    "Retinopatía diabética": {
-        "Bajo": "Signos tempranos de retinopatia diabetica. Se recomienda control estricto de glucemia y seguimiento oftalmologico.",
-        "Moderado": "Retinopatia diabetica moderada. Se recomienda consulta con oftalmologo para posibles tratamientos (laser, inyecciones).",
-        "Alto": "Retinopatia diabetica avanzada. Se requiere evaluacion urgente para prevenir perdida de vision severa.",
-    },
-    "Degeneración macular": {
-        "Bajo": "Posibles signos tempranos de degeneracion macular. Se recomienda suplementacion nutricional y seguimiento.",
-        "Moderado": "Degeneracion macular moderada. Se recomienda consulta con oftalmologo para opciones de tratamiento.",
-        "Alto": "Degeneracion macular avanzada. Se requiere evaluacion urgente para preservar la vision central.",
-    },
-    "Retina sana": {
-        "Bajo": "La retina aparece saludable. Se recomienda revisiones periodicas de rutina.",
-        "Moderado": "La retina aparece saludable. Continua con revisiones periodicas.",
-        "Alto": "La retina aparece saludable. Mantenha habitos saludables y revisiones regulares.",
+    "Miopía": {
+        "Bajo": "Se detectan signos leves de miopia. Se recomienda revision periodica y control de la progression.",
+        "Moderado": "Miopia moderada detectada. Se recomienda evaluacion oftalmologica completa y posibles opciones de correccion.",
+        "Alto": "Miopia alta detectada. Se requiere evaluacion urgente para prevenir complicaciones retinianas.",
     },
 }
 
@@ -180,7 +170,7 @@ def _fallback_diagnosis(image_type: str) -> dict:
         level, confidence = "Moderado", "Media"
     else:
         level, confidence = "Alto", "Alta"
-    recs = RECOMMENDATIONS.get(winner, RECOMMENDATIONS["Retina sana"])
+    recs = RECOMMENDATIONS.get(winner, RECOMMENDATIONS["Catarata"])
     return {
         "disease": winner,
         "probability": probability,

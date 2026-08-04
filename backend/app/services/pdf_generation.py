@@ -138,8 +138,10 @@ class PDFReportGenerator:
         
         diagnosis_table = Table(diagnosis_data, colWidths=[5*cm, 10*cm])
         
-        if disease != 'Retina sana':
-            bg_color = colors.HexColor('#f8d7da') if level == 'Alto' else colors.HexColor('#fff3cd') if level == 'Moderado' else colors.HexColor('#d4edda')
+        if level == 'Alto':
+            bg_color = colors.HexColor('#f8d7da')
+        elif level == 'Moderado':
+            bg_color = colors.HexColor('#fff3cd')
         else:
             bg_color = colors.HexColor('#d4edda')
         

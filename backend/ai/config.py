@@ -10,14 +10,12 @@ IMAGE_SIZE = (224, 224)
 BATCH_SIZE = 32
 EPOCHS = 30
 LEARNING_RATE = 0.001
-NUM_CLASSES = 5
+NUM_CLASSES = 3
 
 CLASS_NAMES = [
     "Catarata",
     "Glaucoma",
-    "Retinopatía diabética",
-    "Degeneración macular",
-    "Retina sana",
+    "Miopía",
 ]
 
 IMAGE_TYPES = ["Catarata", "Glaucoma", "Miopía"]
