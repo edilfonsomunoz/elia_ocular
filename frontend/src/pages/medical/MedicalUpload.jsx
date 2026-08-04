@@ -55,7 +55,8 @@ const MedicalUpload = () => {
     }
 
     setUploading(true);
-    setMessage({ type: '', text: '' });
+    setDiagnosing(true);
+    setMessage({ type: 'info', text: 'Subiendo imagen...' });
     setDiagnosisResult(null);
     setUploadedImageId(null);
 
@@ -68,10 +69,18 @@ const MedicalUpload = () => {
 
       const uploadedImage = await uploadMedicalImage(formData);
       setUploadedImageId(uploadedImage.id);
-      setMessage({ type: 'success', text: 'Imagen subida exitosamente. Pulse Diagnosticar para obtener el resultado.' });
+      setMessage({ type: 'info', text: 'Imagen subida. Diagnosticando...' });
+
+      try {
+        const diagnosis = await diagnoseImage(uploadedImage.id);
+        setDiagnosisResult(diagnosis);
+        setMessage({ type: 'success', text: 'Diagnostico completado exitosamente' });
+      } catch (diagError) {
+        setMessage({ type: 'warning', text: 'Imagen subida pero el diagnostico fallo. El modelo de IA no esta disponible.' });
+      }
     } catch (error) {
       const data = error.response?.data;
-      let text = 'Error al subir la imagen. Verifique el tamaño y el formato.';
+      let text = 'Error al subir la imagen. Verifique el tamano y el formato.';
       if (data && typeof data.detail === 'string') {
         text = data.detail;
       } else if (Array.isArray(data?.detail)) {
@@ -79,32 +88,12 @@ const MedicalUpload = () => {
       } else if (error.response?.status) {
         text = `Error del servidor (${error.response.status}) al subir la imagen.`;
       } else if (error.code === 'ECONNABORTED') {
-        text = 'La subida tardó demasiado. Intente con una imagen más pequeña.';
+        text = 'La subida tardo demasiado. Intente con una imagen mas pequena.';
       }
       console.error('Error al subir imagen:', error);
       setMessage({ type: 'error', text });
     } finally {
       setUploading(false);
-    }
-  };
-
-  const handleDiagnose = async () => {
-    if (!uploadedImageId) {
-      setMessage({ type: 'error', text: 'Primero suba una imagen' });
-      return;
-    }
-
-    setDiagnosing(true);
-    setMessage({ type: '', text: '' });
-
-    try {
-      const diagnosis = await diagnoseImage(uploadedImageId);
-      setDiagnosisResult(diagnosis);
-      setImageType(diagnosis.disease);
-      setMessage({ type: 'success', text: 'Diagnostico completado exitosamente' });
-    } catch (diagError) {
-      setMessage({ type: 'warning', text: 'El diagnostico fallo. El modelo de IA no esta disponible.' });
-    } finally {
       setDiagnosing(false);
     }
   };
@@ -237,35 +226,18 @@ const MedicalUpload = () => {
           <div className="flex gap-3">
             <button
               onClick={handleUpload}
-              disabled={!file || !selectedPatient || !imageType || uploading || diagnosing || !!uploadedImageId}
+              disabled={!file || !selectedPatient || !imageType || uploading || diagnosing}
               className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-cyan-500/20"
             >
-              {uploading ? (
+              {uploading || diagnosing ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Subiendo...</span>
+                  <span>{uploading && !diagnosisResult ? 'Subiendo...' : 'Diagnosticando...'}</span>
                 </>
               ) : (
                 <>
-                  <Upload className="w-4 h-4" />
-                  <span>Subir</span>
-                </>
-              )}
-            </button>
-            <button
-              onClick={handleDiagnose}
-              disabled={!uploadedImageId || diagnosing || uploading}
-              className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-emerald-500/20"
-            >
-              {diagnosing ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Diagnosticando...</span>
-                </>
-              ) : (
-                <>
-                  <Activity className="w-4 h-4" />
-                  <span>Diagnosticar</span>
+                  <Stethoscope className="w-4 h-4" />
+                  <span>Subir y Diagnosticar</span>
                 </>
               )}
             </button>
