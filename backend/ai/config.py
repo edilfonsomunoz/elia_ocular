@@ -19,7 +19,7 @@ CLASS_NAMES = [
     "Normal",
 ]
 
-IMAGE_TYPES = ["Catarata", "Glaucoma", "Miopía"]
+IMAGE_TYPES = ["Catarata", "Glaucoma", "Miopía", "Normal"]
 
 os.makedirs(MODELS_DIR, exist_ok=True)
 os.makedirs(UPLOADS_DIR, exist_ok=True)
