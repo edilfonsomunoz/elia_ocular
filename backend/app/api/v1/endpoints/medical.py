@@ -477,6 +477,45 @@ def list_all_results(
     return result
 
 
+@router.delete("/results/{result_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_result(
+    *,
+    db: Session = Depends(deps.get_db),
+    result_id: int,
+    current_user: User = Depends(deps.get_current_user),
+) -> None:
+    """
+    Eliminar un resultado de diagnostico. Solo administradores y medicos pueden eliminarlo.
+    """
+    if current_user.role not in [UserRole.ADMINISTRADOR.value, UserRole.MEDICO.value]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tiene permisos para eliminar resultados diagnósticos."
+        )
+
+    diagnosis = db.query(Diagnosis).filter(Diagnosis.id == result_id).first()
+    if not diagnosis:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Resultado diagnóstico no encontrado."
+        )
+
+    image = db.query(MedicalImage).filter(MedicalImage.id == diagnosis.image_id).first()
+
+    db.delete(diagnosis)
+    db.commit()
+
+    if image:
+        file_path = os.path.join(UPLOADS_DIR, f"patient_{image.patient_id}", image.filename)
+        if os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+            except OSError:
+                pass
+        db.delete(image)
+        db.commit()
+
+
 @router.get("/stats")
 def get_stats(
     *,

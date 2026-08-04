@@ -45,6 +45,11 @@ export const listResults = async (patientId = null) => {
   return response.data;
 };
 
+export const deleteResult = async (resultId) => {
+  const response = await axiosInstance.delete(`/medical/results/${resultId}`);
+  return response.data;
+};
+
 export const createPatient = async (patientData) => {
   const response = await axiosInstance.post('/patients/', patientData);
   return response.data;

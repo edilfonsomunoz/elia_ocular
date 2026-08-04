@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { listResults, listPatients } from '../../api/medical';
+import { listResults, listPatients, deleteResult } from '../../api/medical';
 import {
   ClipboardCheck, Brain, TrendingUp, Heart, Filter, AlertTriangle,
   CheckCircle, ChevronDown, ChevronUp, User, FileText, Stethoscope,
-  Activity, Search, Eye, BarChart2, Target, Cpu, Zap, TrendingDown
+  Activity, Search, Eye, BarChart2, Target, Cpu, Zap, TrendingDown,
+  Trash2
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -117,6 +118,17 @@ const MedicalResults = () => {
     if (level === 'Alto') return 'text-red-400 bg-red-500/10 border-red-500/20';
     if (level === 'Moderado') return 'text-amber-400 bg-amber-500/10 border-amber-500/20';
     return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
+  };
+
+  const handleDelete = async (result, e) => {
+    e.stopPropagation();
+    if (!window.confirm(`¿Eliminar el diagnóstico "${result.disease}" de ${result.patient_name || 'este paciente'}? Esta acción no se puede deshacer.`)) return;
+    try {
+      await deleteResult(result.id);
+      setResults((prev) => prev.filter((r) => r.id !== result.id));
+    } catch (err) {
+      window.alert(err.response?.data?.detail || 'No se pudo eliminar el resultado.');
+    }
   };
 
   const getLevelBarColor = (probability) => {
@@ -442,7 +454,14 @@ const MedicalResults = () => {
                               {new Date(result.diagnosed_at).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}
                             </p>
                           </div>
-                          <div className="flex-shrink-0">
+                          <div className="flex-shrink-0 flex items-center gap-1">
+                            <button
+                              onClick={(e) => handleDelete(result, e)}
+                              title="Eliminar resultado diagnóstico"
+                              className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
                             {isExpanded ? (
                               <ChevronUp className="w-4 h-4 text-slate-500" />
                             ) : (
